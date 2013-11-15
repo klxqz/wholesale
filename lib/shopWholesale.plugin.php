@@ -16,7 +16,10 @@ class shopWholesalePlugin extends shopPlugin {
                 $text = sprintf($text, $min_order_sum);
                 $view = wa()->getView();
                 $view->assign('text', $text);
-                $html = $view->fetch('plugins/wholesale/templates/wholesale.html');
+                $view->assign('color', $this->getSettings('color'));
+                $view->assign('font_weight', $this->getSettings('font_weight'));
+                $template_path = wa()->getAppPath('plugins/wholesale/templates/wholesale.html', 'shop');
+                $html = $view->fetch($template_path);
                 return $html;
             }
         }

@@ -26,4 +26,26 @@ return array(
         'value' => 'Вы не можете оформить заказ т.к. сумма Вашего заказа меньше суммы минимального заказа. Сумма минимального заказа %s',
         'control_type' => waHtmlControl::INPUT,
     ),
+    
+    'color' => array(
+        'title' => 'Цвет сообщения',
+        'description' => 'Цвет в шестнадцатиричном виде #000000, http://getcolor.ru/',
+        'value' => '#FF0000',
+        'control_type' => waHtmlControl::INPUT,
+    ),
+    
+    'font_weight' => array(
+        'title' => 'Насыщенность шрифт',
+        'description' => '',
+        'value' => 'bold',
+        'control_type' => waHtmlControl::SELECT,
+        'options' => array(
+            'bold' => 'полужирное начертание',
+            'normal' => 'нормальное начертание',
+
+        )
+    ),
+    
+    
+    
 );
