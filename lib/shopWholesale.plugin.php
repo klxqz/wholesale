@@ -18,7 +18,7 @@ class shopWholesalePlugin extends shopPlugin {
                 $view->assign('text', $text);
                 $view->assign('color', $this->getSettings('color'));
                 $view->assign('font_weight', $this->getSettings('font_weight'));
-                $template_path = wa()->getAppPath('plugins/wholesale/templates/wholesale.html', 'shop');
+                $template_path = wa()->getAppPath('plugins/wholesale/templates/Wholesale.html', 'shop');
                 $html = $view->fetch($template_path);
                 return $html;
             }

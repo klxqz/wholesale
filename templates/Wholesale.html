@@ -1,0 +1,18 @@
+<style>
+    input[name="checkout"]{
+        display: none;
+    }
+    .cart_wholesale{
+        color: {$color|escape};
+        font-weight: {$font_weight|escape};
+    }
+</style>
+<script>
+    $(function() {
+        var form = $('input[name="checkout"]').closest('form');
+        form.submit(function() {
+            return false;
+        });
+    });
+</script>
+<div class="cart_wholesale">{$text|escape}</div>
