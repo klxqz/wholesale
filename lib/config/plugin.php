@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    'name' => 'Оптовый заказ',
+    'name' => 'Минимальная сумма заказа',
     'description' => 'Ограничение минимальной суммы заказа',
     'img' => 'img/wholesale.png',
     'vendor' => '985310',
