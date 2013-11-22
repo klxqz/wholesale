@@ -33,7 +33,7 @@
         if (cart_total != $('.cart-total').text()) {
             $.ajax({
                 type: 'POST',
-                url: '{$wa_url}wholesale/',
+                url: '{$wa_app_url}wholesale/',
                 dataType: 'json',
                 success: function(data, textStatus, jqXHR) {
                     wholesale_check = data.data.check;

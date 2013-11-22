@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @author Коробов Николай wa-plugins.ru <support@wa-plugins.ru>
+ * @link http://wa-plugins.ru/
+ */
 class shopWholesalePlugin extends shopPlugin {
 
     public function frontendCart() {
@@ -12,7 +16,7 @@ class shopWholesalePlugin extends shopPlugin {
 
             $view = wa()->getView();
             $view->assign('message', $message);
-            $view->assign('check', (int)$check);
+            $view->assign('check', (int) $check);
             $view->assign('color', $this->getSettings('color'));
             $view->assign('font_weight', $this->getSettings('font_weight'));
             $template_path = wa()->getAppPath('plugins/wholesale/templates/FrontendCart.html', 'shop');
