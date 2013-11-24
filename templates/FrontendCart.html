@@ -5,54 +5,52 @@
     }
 </style>
 <script>
-    var wholesale_message = '{$message|escape}';
-    var wholesale_check = {$check};
-    var cart_total = $('.cart-total').text();
-
-    function submitForm()
-    {
-        if(!wholesale_check) {
-            return false;
-        }
-    }
-    function locking() {
-        $('input[name="checkout"]').hide();
-        var form = $('input[name="checkout"]').closest('form');
-        form.submit(submitForm);
-        $('.cart_wholesale').text(wholesale_message);
-    }
-    
-    function unlocking() {
-        $('input[name="checkout"]').show();
-        var form = $('input[name="checkout"]').closest('form');
-        form.submit(submitForm);
-        $('.cart_wholesale').text('');
-    }
-
-    function checkOrder() {
-        if (cart_total != $('.cart-total').text()) {
-            $.ajax({
-                type: 'POST',
-                url: '{$wa_app_url}wholesale/',
-                dataType: 'json',
-                success: function(data, textStatus, jqXHR) {
-                    wholesale_check = data.data.check;
-                    if(data.data.check) {
-                        unlocking();
-                    } else {
-                        locking();
-                    }
-                }
-            });
-            cart_total = $('.cart-total').text();
-        }
-    }
-
     $(function() {
+        var wholesale_message = '{$message|escape}';
+        var wholesale_check = {$check};
+        var cart_total = $('.cart-total').text();
+
+        function submitForm()
+        {
+            if (!wholesale_check) {
+                return false;
+            }
+        }
+        function locking() {
+            $('input[name="checkout"]').hide();
+            var form = $('input[name="checkout"]').closest('form');
+            form.submit(submitForm);
+            $('.cart_wholesale').text(wholesale_message);
+        }
+
+        function unlocking() {
+            $('input[name="checkout"]').show();
+            var form = $('input[name="checkout"]').closest('form');
+            form.submit(submitForm);
+            $('.cart_wholesale').text('');
+        }
+
         if (!wholesale_check) {
             locking();
         }
-        setInterval(checkOrder, 500);
+        setInterval(function() {
+            if (cart_total != $('.cart-total').text()) {
+                $.ajax({
+                    type: 'POST',
+                    url: '{$wa_app_url}wholesale/',
+                    dataType: 'json',
+                    success: function(data, textStatus, jqXHR) {
+                        wholesale_check = data.data.check;
+                        if (data.data.check) {
+                            unlocking();
+                        } else {
+                            locking();
+                        }
+                    }
+                });
+                cart_total = $('.cart-total').text();
+            }
+        }, 500);
     });
 </script>
 
