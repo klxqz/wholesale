@@ -9,10 +9,11 @@ return array(
     'description' => 'Ограничение минимальной суммы заказа',
     'img' => 'img/wholesale.png',
     'vendor' => '985310',
-    'version' => '1.0.0',
+    'version' => '1.0.1',
     'rights' => false,
     'frontend' => true,
     'handlers' => array(
         'frontend_cart' => 'frontendCart',
+        'frontend_checkout' => 'frontendCheckout'
     )
 );

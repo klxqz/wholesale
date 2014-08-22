@@ -5,6 +5,16 @@
  * @link http://wa-plugins.ru/
  */
 class shopWholesalePlugin extends shopPlugin {
+    
+    public function frontendCheckout() {
+        if ($this->getSettings('status')) {
+            $cart = new shopCart();
+            if(!$this->checkOrder($min_order_sum)){
+                $cart_url = wa()->getRouteUrl('shop/frontend/cart');
+                wa()->getResponse()->redirect($cart_url);
+            }
+        }
+    }
 
     public function frontendCart() {
         if ($this->getSettings('status')) {
