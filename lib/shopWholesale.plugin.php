@@ -6,10 +6,10 @@
  */
 class shopWholesalePlugin extends shopPlugin {
     
-    public function frontendCheckout() {
+    public function frontendCheckout($param) {
         if ($this->getSettings('status')) {
             $cart = new shopCart();
-            if(!$this->checkOrder($min_order_sum)){
+            if(!$this->checkOrder($min_order_sum) && $param['step'] != 'success'){
                 $cart_url = wa()->getRouteUrl('shop/frontend/cart');
                 wa()->getResponse()->redirect($cart_url);
             }
