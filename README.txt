@@ -1,13 +1,13 @@
-Плагин "Минимальная сумма заказа" для Shop-Script 5
+Плагин "Минимальный заказ" для Shop-Script 5
 --------------------------
-Разработчик Коробов Николай wa-plugins.ru <support@wa-plugins.ru>
+Разработчик wa-plugins.ru <support@wa-plugins.ru>
 
 Ограничение минимальной суммы заказа
 --------------------------
 Установка:
 
    1) Скопируйте в каталог wa-apps/shop/plugins/ папку wholesale/
-    2) Добавьте запись в конфигурационный файл фреймворка wa-config/apps/shop/plugins.php:
+   2) Добавьте запись в конфигурационный файл фреймворка wa-config/apps/shop/plugins.php:
           'wholesale' => true
           Пример содержимого файла plugins.php:
             return array (

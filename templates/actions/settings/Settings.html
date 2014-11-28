@@ -1,0 +1,211 @@
+<style type="text/css">
+    #wa .CodeMirror{
+        border: 1px solid #eee;
+    }
+    .CodeMirror-scroll {
+        height: auto;
+        overflow-y: hidden;
+        overflow-x: auto;
+    }
+    .plugin-menu{
+        float: right;
+        list-style: none;
+    }
+
+    .plugin-menu li{
+        float: left;
+        margin-left: 10px;
+    }
+</style>
+<ul class="plugin-menu">
+    <li><a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/wholesale/reviews/">Оставить отзыв о плагине</a></li>
+    <li><a href="mailto:support@wa-plugins.ru">Поддержка разработчика плагина</a></li>
+    <li><a target="_blank" href="http://wa-plugins.ru/">WA-PLUGINS.ru - сайт разработчика</a></li>
+</ul>
+<h1>Минимальный заказ</h1>
+<div class="fields form">
+    <form action="?plugin=wholesale&action=save" method="post" id="plugins-settings-form">
+        {$wa->csrf()}
+        <div class="field-group">
+            <div class="field">
+                <div class="name">
+                    Статус плагина
+                </div>
+                <div class="value">
+                    <select name="shop_wholesale[status]">
+                        <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
+                        <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        {$tpls = array()}
+        {foreach $domain_routes as $domain => $routes}
+            {foreach $routes as $route}
+                {$domain_route = "`$domain`/`$route.url`"}
+                {$domain_hash = md5($domain_route)}
+                {$setting = $domain_settings[$domain_hash]}
+                {$count = array_push($tpls,"'sf-template-`$domain_hash`'")}
+                <div class="field-group">
+                    <h2>Поселение: {$domain_route}</h2>
+
+                    <div class="field">
+                        <div class="name">
+                            Статус плагина для поселения
+                        </div>
+                        <div class="value">
+                            <select name="domains_settings[{$domain_hash}][status]">
+                                <option {if $setting.status|default:1 == 1} selected="selected"{/if} value="1">Включен</option>
+                                <option {if $setting.status|default:1 == 0} selected="selected"{/if} value="0">Выключен</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="name">
+                            Минимальная сумма заказа
+                        </div>
+                        <div class="value">
+                            <input type="text" name="domains_settings[{$domain_hash}][min_order_sum]" value="{$setting.min_order_sum|default:0|escape}"  />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="name">
+                            Текст сообщения
+                        </div>
+                        <div class="value">
+                            <input type="text" class="long" name="domains_settings[{$domain_hash}][min_order_sum_message]" value="{$setting.min_order_sum_message|default:''|escape}"  />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Минимальное количество товаров
+                        </div>
+                        <div class="value">
+                            <input type="text" name="domains_settings[{$domain_hash}][min_order_products]" value="{$setting.min_order_products|default:0|escape}"  />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Текст сообщения
+                        </div>
+                        <div class="value">
+                            <input type="text" class="long" name="domains_settings[{$domain_hash}][min_order_products_message]" value="{$setting.min_order_products_message|default:''|escape}"  />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="name">
+                            Использовать индвивидуальные настройки минимального количества для каждого товара
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_count_setting]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_count_setting]" {if $setting.product_count_setting|default:1}checked="checked"{/if} />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Текст сообщения
+                        </div>
+                        <div class="value">
+                            <input type="text" class="long" name="domains_settings[{$domain_hash}][min_product_count_message]" value="{$setting.min_product_count_message|default:''|escape}"  />
+                        </div>
+                    </div>
+
+
+                    <div class="field">
+                        <div class="name">
+                            Вывод в стандартном месте (хук frontend_cart)
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][default_output]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][default_output]" {if $setting.default_output|default:1}checked="checked"{/if} />
+                            или используйте хелпер вывода <b>{literal}{shopWholesalePlugin::display()}{/literal}</b>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">Шаблон<br /><span class="hint">HTML + Smarty</span></div>
+                        <div class="value no-shift">
+
+                            <a class="edit-templates" href="javascript:void(0)"><i class="icon16 edit"></i>Изменить шаблон</a>
+
+                            <div class="templates-block">
+                                <div id="s-editor-core-wrapper">
+                                    <textarea id="sf-template-{$domain_hash}"  class="body" name="domains_settings[{$domain_hash}][template]">{$setting.template|escape}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        {if $setting.change_tpl}
+                            <div class="value">
+                                <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+                                <input type="checkbox" name="domains_settings[{$domain_hash}][reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+                <hr>
+            {/foreach}
+        {/foreach}
+
+
+        <div class="field">
+            <div class="value submit">
+                <input type="submit" class="button green" value="Сохранить">
+                <span id="plugins-settings-form-status" style="display:none">
+                    <i style="vertical-align:middle" class="icon16 yes"></i> [`Saved`]
+                </span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+
+        var ids = [{implode(',', $tpls)}];
+        for (var i = 0; i < ids.length; i++) {
+            var c = CodeMirror.fromTextArea(document.getElementById(ids[i]), {
+                mode: "text/html",
+                tabMode: "indent",
+                height: "dynamic",
+                lineWrapping: true
+            });
+            $(ids[i]).change(function() {
+                c.setValue($(this).val())
+            });
+            $(ids[i]).submit(function() {
+                var f = $(this);
+                $.post(f.attr('action'), f.serialize(), function(response) {
+                    if (response.status == 'ok') {
+                        $('#wa-design-button').removeClass('red').addClass('green');
+                        $("#wa-editor-status-fail").hide()
+                        $("#wa-editor-status-ok span").html(response.data.message);
+                        $("#wa-editor-status-ok").fadeIn('slow', function() {
+                            $(this).fadeOut(1000);
+                        });
+                    } else {
+                        $('#wa-design-button').removeClass('green').addClass('red');
+                        $("#wa-editor-status-ok").hide();
+                        $("#wa-editor-status-fail span").html(response.errors.join(', '));
+                        $("#wa-editor-status-fail").fadeIn('slow');
+                    }
+                }, "json")
+                return false;
+            });
+        }
+
+        $('.templates-block').hide();
+        $('.edit-templates').click(function() {
+            var template = $(this).closest('.field').find('.templates-block');
+            if (template.is(':visible')) {
+                template.hide();
+            } else {
+                template.show();
+            }
+
+        });
+    });
+</script>
