@@ -1,0 +1,35 @@
+<input type="hidden" name="category_id" value="{$category.id}" />
+
+<div class="field">
+    <div class="name">Минимальная сумма для заказа</div>
+    <div class="value no-shift">
+        <input type="text" name="min_sum" value="{$category.min_sum|escape}" class="bold numerical small">
+    </div>
+</div>
+<div class="field">
+    <div class="name">Минимальное количество товара для заказа</div>
+    <div class="value no-shift">
+        <input type="text" name="min_product_count" value="{$category.min_product_count|escape}" class="bold numerical small">
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('input[name="min_sum"], input[name="min_product_count"]').change(function () {
+            $.ajax({
+                url: "?plugin=wholesale&action=saveCategory",
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    _csrf: $('input[name=_csrf]').val(),
+                    category_id: $('input[name=category_id]').val(),
+                    name: $(this).attr('name'),
+                    value: $(this).val()
+                }
+            }).done(function (response) {
+
+
+            });
+        });
+    });
+</script>

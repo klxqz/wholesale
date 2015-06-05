@@ -9,10 +9,13 @@ class shopWholesalePlugin extends shopPlugin {
     public static $plugin_id = array('shop', 'wholesale');
     public static $default_settings = array(
         'status' => 1,
+        'redirect' => 0,
         'min_order_sum' => 0,
         'min_order_sum_message' => 'Вы не можете оформить заказ т.к. сумма Вашего заказа меньше минимальной. Минимальная сумма заказа %s',
         'min_order_products' => 0,
         'min_order_products_message' => 'Вы не можете оформить заказ т.к. количество товаров в Вашей корзине меньше минимального. Минимальное количество товаров %s шт.',
+        'min_order_sum_category_message' => 'Вы не можете оформить заказ т.к. сумма Вашего заказа для категории "%s" меньше минимальной. Минимальная сумма заказа %s',
+        'min_order_count_category_message' => 'Вы не можете оформить заказ т.к. количество товаров для категории "%s" в Вашей корзине меньше минимального. Минимальное количество товаров %s шт.',
         'product_count_setting' => 1,
         'min_product_count_message' => 'Вы не можете оформить заказ т.к. количество товара "%s" в Вашей корзине меньше минимального. Минимальное количество товара %s шт.',
         'default_output' => 1,
@@ -37,13 +40,25 @@ class shopWholesalePlugin extends shopPlugin {
     );
 
     public function backendProductEdit($product) {
-        $html = '<div class="field">
-                    <div class="name">Минимальное количество товара для заказа</div>
-                    <div class="value no-shift">
-                        <input type="text" name="product[min_product_count]" value="' . $product->min_product_count . '" class="bold numerical small">
-                    </div>
-                </div>';
-        return array('basics' => $html);
+        if ($this->getSettings('status')) {
+            $html = '<div class="field">
+                        <div class="name">Минимальное количество товара для заказа</div>
+                        <div class="value no-shift">
+                            <input type="text" name="product[min_product_count]" value="' . $product->min_product_count . '" class="bold numerical small">
+                        </div>
+                    </div>';
+            return array('basics' => $html);
+        }
+    }
+
+    public function backendCategoryDialog($category) {
+        if ($this->getSettings('status')) {
+            $view = wa()->getView();
+            $view->assign('category', $category);
+            $template_path = wa()->getAppPath('plugins/wholesale/templates/CategoryField.html', 'shop');
+            $html = $view->fetch($template_path);
+            return $html;
+        }
     }
 
     public function checkShipping($shipping_id) {
@@ -75,7 +90,7 @@ class shopWholesalePlugin extends shopPlugin {
 
         $cart = new shopCart();
         $result = self::checkOrder();
-        if (!$result['result'] && $param['step'] != 'success') {
+        if (!$result['result'] && $param['step'] != 'success' && $domain_settings['redirect']) {
             $cart_url = wa()->getRouteUrl('shop/frontend/cart');
             wa()->getResponse()->redirect($cart_url);
         }
@@ -106,7 +121,7 @@ class shopWholesalePlugin extends shopPlugin {
                         $view = wa()->getView();
                         $view->assign('wholesale', array('result' => 0, 'message' => $message));
                         return $view->fetch($templates['shipping']['template_path']);
-                    } elseif ($current_step_key > $shipping_step_key) {
+                    } elseif ($current_step_key > $shipping_step_key && $domain_settings['redirect']) {
                         $shipping_url = wa()->getRouteUrl('shop/frontend/checkout', array('step' => 'shipping'));
                         wa()->getResponse()->redirect($shipping_url);
                     }
@@ -155,6 +170,103 @@ class shopWholesalePlugin extends shopPlugin {
         return true;
     }
 
+    public static function getCategoryMinSum($category_id, &$category_name) {
+
+        $category_model = new shopCategoryModel();
+        $category = $category_model->getById($category_id);
+        if ($category['min_sum'] > 0) {
+            $category_name = $category['name'];
+            return $category['min_sum'];
+        } elseif ($category['parent_id']) {
+            return self::getCategoryMinSum($category['parent_id'], $category_name);
+        }
+        return 0;
+    }
+
+    protected static function inCategory($category, $product) {
+
+        if ($product['category_id'] == $category['id']) {
+            return true;
+        } elseif ($category['parent_id']) {
+            return inCategory($category, $product);
+        }
+        return false;
+    }
+
+    protected static function getCategoryProductsSum($category) {
+        $category_model = new shopCategoryModel();
+        $sum = 0;
+        $cart = new shopCart();
+        $items = $cart->items();
+        foreach ($items as $item) {
+            $category = $category_model->getById($item['product']['category_id']);
+            if ($item['type'] == 'product' && self::inCategory($category, $item['product'])) {
+                $sum += $item['price'] * $item['quantity'];
+            }
+        }
+        return $sum;
+    }
+
+    public static function checkMinCategorySum(&$category_name = null, &$min_category_sum = null) {
+        $cart = new shopCart();
+        $items = $cart->items();
+        foreach ($items as $item) {
+            if ($item['type'] == 'product') {
+                $category_min_sum = self::getCategoryMinSum($item['product']['category_id'], $category_name);
+                $category_sum = self::getCategoryProductsSum($item['product']['category_id']);
+                if ($category_sum < $category_min_sum) {
+                    $min_category_sum = $category_min_sum;
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static function getCategoryMinCount($category_id, &$category_name) {
+
+        $category_model = new shopCategoryModel();
+        $category = $category_model->getById($category_id);
+        if ($category['min_product_count'] > 0) {
+            $category_name = $category['name'];
+            return $category['min_product_count'];
+        } elseif ($category['parent_id']) {
+            return self::getCategoryMinCount($category['parent_id'], $category_name);
+        }
+        return 0;
+    }
+
+    protected static function getCategoryProductsCount($category) {
+        $category_model = new shopCategoryModel();
+        $count = 0;
+        $cart = new shopCart();
+        $items = $cart->items();
+        foreach ($items as $item) {
+            $category = $category_model->getById($item['product']['category_id']);
+            if ($item['type'] == 'product' && self::inCategory($category, $item['product'])) {
+                $count += $item['quantity'];
+            }
+        }
+        return $count;
+    }
+
+    public static function checkMinCategoryCount(&$category_name = null, &$min_category_count = null) {
+        $cart = new shopCart();
+        $items = $cart->items();
+        foreach ($items as $item) {
+            if ($item['type'] == 'product') {
+                $category_min_count = self::getCategoryMinCount($item['product']['category_id'], $category_name);
+                $category_count = self::getCategoryProductsCount($item['product']['category_id']);
+                if ($category_count < $category_min_count) {
+                    $min_category_count = $category_min_count;
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public static function checkOrder() {
         $return = array();
         $domain_settings = shopWholesale::getDomainSettings();
@@ -177,6 +289,12 @@ class shopWholesalePlugin extends shopPlugin {
         } elseif ($domain_settings['product_count_setting'] && !self::checkMinProductCount($product_name, $min_product_count)) {
             $return['result'] = 0;
             $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_product_count);
+        } elseif (!self::checkMinCategorySum($category_name, $min_category_sum)) {
+            $return['result'] = 0;
+            $return['message'] = sprintf($domain_settings['min_order_sum_category_message'], $category_name, shop_currency($min_category_sum));
+        } elseif (!self::checkMinCategoryCount($category_name, $min_category_count)) {
+            $return['result'] = 0;
+            $return['message'] = sprintf($domain_settings['min_order_count_category_message'], $category_name, $min_category_count);
         } else {
             $return['result'] = 1;
             $return['message'] = '';

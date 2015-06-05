@@ -12,7 +12,7 @@ class shopWholesalePluginSettingsAction extends waViewAction {
 
         $domain_routes = wa()->getRouting()->getByApp('shop');
         $domains_settings = shopWholesale::getDomainsSettings();
-        
+
         $model = new shopPluginModel();
 
         $currency = wa('shop')->getConfig()->getCurrency(true);

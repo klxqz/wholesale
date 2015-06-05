@@ -4,7 +4,7 @@
         font-weight: bold;
     }
 </style>
-<script>
+<script type="text/javascript">
     (function ($) {
         $.wholesale_plugin = {
             options: {},
@@ -18,15 +18,17 @@
             },
             locking: function () {
                 $('input[name="checkout"]').hide();
+                $('.checkout-form input[type="submit"]').hide();
                 $('.cart_wholesale').text(this.options.wholesale_message);
             },
             unlocking: function () {
                 $('input[name="checkout"]').show();
+                $('.checkout-form input[type="submit"]').show();
                 $('.cart_wholesale').text('');
             },
             submitForm: function () {
                 var self = this;
-                $('input[name="checkout"]').closest('form').submit(function () {
+                $('input[name="checkout"], .checkout-form input[type="submit"]').closest('form').submit(function () {
                     if (!self.options.wholesale_check) {
                         return false;
                     }

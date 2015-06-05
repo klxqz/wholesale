@@ -63,6 +63,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="field-group">
+                    <div class="field">
+                        <div class="name">
+                            Redirect. Перенаправление (дополнительная защита).
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][redirect]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][redirect]" {if $setting.redirect|default:1}checked="checked"{/if} />
+                            <p class="hint">Если опция включена, тогда осуществляется перенаправление со страниц оформления заказа на страницу корзины. 
+                                Данная опция позволяет предотвратить прямые переходы к оформления заказа минуя корзину, в обход проверки минимального заказа. 
+                                Данная опция вызывает циклическую переадресацию и должна быть отключена, если у вас дополнительно установлен плагин 
+                                <a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/onestep/">"Заказ на одной странице"</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="field-group">
                     <div class="field">
@@ -79,7 +95,7 @@
                             Текст сообщения
                         </div>
                         <div class="value">
-                            <input type="text" class="long" name="domains_settings[{$domain_hash}][min_order_sum_message]" value="{$setting.min_order_sum_message|default:''|escape}"  />
+                            <textarea name="domains_settings[{$domain_hash}][min_order_sum_message]">{$setting.min_order_sum_message|default:''|escape}</textarea>
                         </div>
                     </div>
                 </div>
@@ -98,7 +114,26 @@
                             Текст сообщения
                         </div>
                         <div class="value">
-                            <input type="text" class="long" name="domains_settings[{$domain_hash}][min_order_products_message]" value="{$setting.min_order_products_message|default:''|escape}"  />
+                            <textarea name="domains_settings[{$domain_hash}][min_order_products_message]">{$setting.min_order_products_message|default:''|escape}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field">
+                        <div class="name">
+                            Минимальная сумма заказа для категории. Текст сообщения.
+                        </div>
+                        <div class="value">
+                            <textarea name="domains_settings[{$domain_hash}][min_order_sum_category_message]">{$setting.min_order_sum_category_message|default:''|escape}</textarea>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Минимальное количество товаров для категории. Текст сообщения.
+                        </div>
+                        <div class="value">
+                            <textarea name="domains_settings[{$domain_hash}][min_order_count_category_message]">{$setting.min_order_count_category_message|default:''|escape}</textarea>
                         </div>
                     </div>
                 </div>
@@ -118,7 +153,7 @@
                             Текст сообщения
                         </div>
                         <div class="value">
-                            <input type="text" class="long" name="domains_settings[{$domain_hash}][min_product_count_message]" value="{$setting.min_product_count_message|default:''|escape}"  />
+                            <textarea name="domains_settings[{$domain_hash}][min_product_count_message]">{$setting.min_product_count_message|default:''|escape}</textarea>
                         </div>
                     </div>
                 </div>
