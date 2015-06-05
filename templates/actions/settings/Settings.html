@@ -46,10 +46,11 @@
                 {$domain_route = "`$domain`/`$route.url`"}
                 {$domain_hash = md5($domain_route)}
                 {$setting = $domain_settings[$domain_hash]}
-                {$count = array_push($tpls,"'sf-template-`$domain_hash`'")}
-                <div class="field-group">
-                    <h2>Поселение: {$domain_route}</h2>
+                {$templates = $setting.templates}
 
+                <h2>Поселение: {$domain_route}</h2>
+
+                <div class="field-group">
                     <div class="field">
                         <div class="name">
                             Статус плагина для поселения
@@ -61,13 +62,15 @@
                             </select>
                         </div>
                     </div>
+                </div>
 
+                <div class="field-group">
                     <div class="field">
                         <div class="name">
                             Минимальная сумма заказа
                         </div>
                         <div class="value">
-                            <input type="text" name="domains_settings[{$domain_hash}][min_order_sum]" value="{$setting.min_order_sum|default:0|escape}"  />
+                            <input type="text" name="domains_settings[{$domain_hash}][min_order_sum]" value="{$setting.min_order_sum|default:0|escape}"  /> {$currency}
                         </div>
                     </div>
 
@@ -79,12 +82,15 @@
                             <input type="text" class="long" name="domains_settings[{$domain_hash}][min_order_sum_message]" value="{$setting.min_order_sum_message|default:''|escape}"  />
                         </div>
                     </div>
+                </div>
+
+                <div class="field-group">
                     <div class="field">
                         <div class="name">
                             Минимальное количество товаров
                         </div>
                         <div class="value">
-                            <input type="text" name="domains_settings[{$domain_hash}][min_order_products]" value="{$setting.min_order_products|default:0|escape}"  />
+                            <input type="text" name="domains_settings[{$domain_hash}][min_order_products]" value="{$setting.min_order_products|default:0|escape}"  /> шт.
                         </div>
                     </div>
                     <div class="field">
@@ -95,7 +101,9 @@
                             <input type="text" class="long" name="domains_settings[{$domain_hash}][min_order_products_message]" value="{$setting.min_order_products_message|default:''|escape}"  />
                         </div>
                     </div>
+                </div>
 
+                <div class="field-group">
                     <div class="field">
                         <div class="name">
                             Использовать индвивидуальные настройки минимального количества для каждого товара
@@ -113,8 +121,9 @@
                             <input type="text" class="long" name="domains_settings[{$domain_hash}][min_product_count_message]" value="{$setting.min_product_count_message|default:''|escape}"  />
                         </div>
                     </div>
+                </div>
 
-
+                <div class="field-group">
                     <div class="field">
                         <div class="name">
                             Вывод в стандартном месте (хук frontend_cart)
@@ -125,30 +134,103 @@
                             или используйте хелпер вывода <b>{literal}{shopWholesalePlugin::display()}{/literal}</b>
                         </div>
                     </div>
+                </div>
+
+                <div class="field-group">
                     <div class="field">
-                        <div class="name">Шаблон<br /><span class="hint">HTML + Smarty</span></div>
-                        <div class="value no-shift">
-
-                            <a class="edit-templates" href="javascript:void(0)"><i class="icon16 edit"></i>Изменить шаблон</a>
-
-                            <div class="templates-block">
-                                <div id="s-editor-core-wrapper">
-                                    <textarea id="sf-template-{$domain_hash}"  class="body" name="domains_settings[{$domain_hash}][template]">{$setting.template|escape}</textarea>
-                                </div>
-                            </div>
+                        <div class="name">
+                            Настройки минимального заказа для различных способов доставки
                         </div>
-
-                        {if $setting.change_tpl}
-                            <div class="value">
-                                <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
-                                <input type="checkbox" name="domains_settings[{$domain_hash}][reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
-                            </div>
-                        {/if}
+                        <div class="value">
+                            <table class="zebra" id="s-settings-shipping">
+                                <thead>
+                                <th></th>
+                                <th>Способ доставки</th>
+                                <th>Минимальная сумма заказа</th>
+                                </thead>
+                                <tbody>
+                                    {foreach $instances as $id => $plugin}
+                                        <tr data-id="{$id}">
+                                            <td class="min-width">
+                                                {if !empty($plugin.logo)}
+                                                    <img src="{$plugin.logo}">
+                                                {elseif !empty($plugin.img)}
+                                                    <img src="{$plugin.img}">
+                                                {/if}
+                                            </td>
+                                            <td style="width:30%">
+                                                <h3 class="large{if empty($plugin.status)} gray{/if}">
+                                                    {$plugin.name|escape}
+                                                    {if empty($plugin.status)}([`disabled`]){/if}
+                                                </h3>
+                                                <p class="hint">{strip_tags($plugin.description)}</p>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="domains_settings[{$domain_hash}][plugins][{$id}]" value="{$setting.plugins[$id]|escape|default:0}" /> {$currency}
+                                            </td>
+                                        </tr>
+                                    {foreachelse}
+                                        <tr>
+                                            <td>
+                                                <em class="gray">[`No shipping options are defined.`]</em>
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Текст сообщения
+                        </div>
+                        <div class="value">
+                            <input type="text" class="long" name="domains_settings[{$domain_hash}][shipping_message]" value="{$setting.shipping_message|default:''|escape}"  />
+                        </div>
                     </div>
                 </div>
+
+                <div class="field-group">
+                    <div class="field">
+                        <a class="edit-templates" href="#"><i class="icon16 edit"></i>Шаблоны</a>
+                    </div>
+
+
+                    <div class="templates-block">
+                        {foreach from=$templates key=key item=template}
+                            {$count = array_push($tpls,"'sf-template-`$key`-`$domain_hash`'")}
+                            <div class="field">
+                                <div class="name">
+                                    {$template.name}<br /><span class="hint">HTML + Smarty</span>
+                                </div>
+                                <div class="value no-shift">
+                                    <a class="edit-template" href="#"><i class="icon16 edit"></i>Изменить шаблон</a>
+                                    <div class="template-block">
+                                        <textarea id="sf-template-{$key}-{$domain_hash}"  class="body" name="domains_settings[{$domain_hash}][templates][{$key}][template]">{$template.template|escape}</textarea>
+
+                                        {if $template.change_tpl}
+                                            <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+                                            <input type="checkbox" name="domains_settings[{$domain_hash}][templates][{$key}][reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+                                        {/if}
+
+                                    </div>
+                                </div>
+                            </div>
+                        {/foreach}
+                    </div>
+                </div>
+
+
+
                 <hr>
             {/foreach}
         {/foreach}
+
+        <div class="field">
+            <div class="value">
+                <input type="checkbox" name="reset" value="1"  /> - Сбросить все изменения
+            </div>
+        </div>
 
 
         <div class="field">
@@ -163,7 +245,7 @@
 </div>
 
 <script type="text/javascript">
-    $(function() {
+    $(function () {
 
         var ids = [{implode(',', $tpls)}];
         for (var i = 0; i < ids.length; i++) {
@@ -173,17 +255,17 @@
                 height: "dynamic",
                 lineWrapping: true
             });
-            $(ids[i]).change(function() {
+            $(ids[i]).change(function () {
                 c.setValue($(this).val())
             });
-            $(ids[i]).submit(function() {
+            $(ids[i]).submit(function () {
                 var f = $(this);
-                $.post(f.attr('action'), f.serialize(), function(response) {
+                $.post(f.attr('action'), f.serialize(), function (response) {
                     if (response.status == 'ok') {
                         $('#wa-design-button').removeClass('red').addClass('green');
                         $("#wa-editor-status-fail").hide()
                         $("#wa-editor-status-ok span").html(response.data.message);
-                        $("#wa-editor-status-ok").fadeIn('slow', function() {
+                        $("#wa-editor-status-ok").fadeIn('slow', function () {
                             $(this).fadeOut(1000);
                         });
                     } else {
@@ -197,15 +279,27 @@
             });
         }
 
-        $('.templates-block').hide();
-        $('.edit-templates').click(function() {
-            var template = $(this).closest('.field').find('.templates-block');
+        $('.template-block').hide();
+        $('.edit-template').click(function () {
+            var template = $(this).closest('.field').find('.template-block');
             if (template.is(':visible')) {
                 template.hide();
             } else {
                 template.show();
             }
+            return false;
 
+        });
+
+        $('.templates-block').hide();
+        $('.edit-templates').click(function () {
+            var block = $(this).parent().next('.templates-block');
+            if (block.is(':visible')) {
+                block.hide();
+            } else {
+                block.show();
+            }
+            return false;
         });
     });
 </script>

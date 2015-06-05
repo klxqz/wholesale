@@ -16,8 +16,24 @@ class shopWholesalePlugin extends shopPlugin {
         'product_count_setting' => 1,
         'min_product_count_message' => 'Вы не можете оформить заказ т.к. количество товара "%s" в Вашей корзине меньше минимального. Минимальное количество товара %s шт.',
         'default_output' => 1,
-        'template' => '',
-        'change_tpl' => 0
+        'plugins' => array(),
+        'shipping_message' => 'Вы не можете воспользоваться выбранным способом доставки т.к. сумма Вашего заказа меньше минимальной. Минимальная сумма заказа для данного способа доставки %s Попробуйте выбрать другой способ доставки или увеличить сумму заказа.',
+        'templates' => array(
+            'cart' => array(
+                'name' => 'Шаблон для страницы корзины',
+                'tpl_path' => 'plugins/wholesale/templates/',
+                'tpl_name' => 'FrontendCart',
+                'tpl_ext' => 'html',
+                'public' => false
+            ),
+            'shipping' => array(
+                'name' => 'Шаблон для страницы доставки',
+                'tpl_path' => 'plugins/wholesale/templates/',
+                'tpl_name' => 'Shipping',
+                'tpl_ext' => 'html',
+                'public' => false
+            )
+        )
     );
 
     public function backendProductEdit($product) {
@@ -30,14 +46,71 @@ class shopWholesalePlugin extends shopPlugin {
         return array('basics' => $html);
     }
 
+    public function checkShipping($shipping_id) {
+        $return = array();
+        $domain_settings = shopWholesale::getDomainSettings();
+        $plugins = $domain_settings['plugins'];
+
+        $cart = new shopCart();
+        $def_currency = wa('shop')->getConfig()->getCurrency(true);
+        $cur_currency = wa('shop')->getConfig()->getCurrency(false);
+        $total = $cart->total(true);
+        $total = shop_currency($total, $cur_currency, $def_currency, false);
+
+        if (!empty($plugins[$shipping_id]) && $total < $plugins[$shipping_id]) {
+            $message = sprintf($domain_settings['shipping_message'], shop_currency($plugins[$shipping_id]));
+            $return = array('result' => 0, 'message' => $message);
+        } else {
+            $return = array('result' => 1, 'message' => '');
+        }
+
+        return $return;
+    }
+
     public function frontendCheckout($param) {
         $domain_settings = shopWholesale::getDomainSettings();
-        if ($this->getSettings('status') && $domain_settings['status']) {
-            $cart = new shopCart();
-            $result = self::checkOrder();
-            if (!$result['result'] && $param['step'] != 'success') {
-                $cart_url = wa()->getRouteUrl('shop/frontend/cart');
-                wa()->getResponse()->redirect($cart_url);
+        if (!$this->getSettings('status') || !$domain_settings['status']) {
+            return false;
+        }
+
+        $cart = new shopCart();
+        $result = self::checkOrder();
+        if (!$result['result'] && $param['step'] != 'success') {
+            $cart_url = wa()->getRouteUrl('shop/frontend/cart');
+            wa()->getResponse()->redirect($cart_url);
+        }
+
+
+        $data = wa()->getStorage()->get('shop/checkout');
+        $plugins = $domain_settings['plugins'];
+        $templates = $domain_settings['templates'];
+
+        if (!empty($data['shipping']['id'])) {
+            $shipping_id = $data['shipping']['id'];
+            if (!empty($plugins[$shipping_id])) {
+                $cart = new shopCart();
+                $def_currency = wa('shop')->getConfig()->getCurrency(true);
+                $cur_currency = wa('shop')->getConfig()->getCurrency(false);
+                $total = $cart->total(true);
+                $total = shop_currency($total, $cur_currency, $def_currency, false);
+
+                if ($total < $plugins[$shipping_id]) {
+                    $steps = array_keys(wa()->getConfig()->getCheckoutSettings());
+                    $current_step_key = array_search($param['step'], $steps);
+                    $shipping_step_key = array_search('shipping', $steps);
+
+
+                    if ($param['step'] == 'shipping') {
+                        $message = sprintf($domain_settings['shipping_message'], shop_currency($plugins[$shipping_id]));
+
+                        $view = wa()->getView();
+                        $view->assign('wholesale', array('result' => 0, 'message' => $message));
+                        return $view->fetch($templates['shipping']['template_path']);
+                    } elseif ($current_step_key > $shipping_step_key) {
+                        $shipping_url = wa()->getRouteUrl('shop/frontend/checkout', array('step' => 'shipping'));
+                        wa()->getResponse()->redirect($shipping_url);
+                    }
+                }
             }
         }
     }
@@ -56,26 +129,17 @@ class shopWholesalePlugin extends shopPlugin {
         }
 
         $domain_settings = shopWholesale::getDomainSettings();
+        $templates = $domain_settings['templates'];
 
         if (!$domain_settings['status']) {
             return false;
-        }
-
-        if (!$domain_settings['change_tpl']) {
-            $template_path = wa()->getAppPath('plugins/wholesale/templates/FrontendCart.html', 'shop');
-        } else {
-            $route_hash = shopWholesale::getRouteHash();
-            $template_path = wa()->getCachePath('plugins/wholesale/' . $route_hash . '.html');
-            if (!file_exists($tpl_path)) {
-                file_put_contents($tpl_path, $domain_settings['template']);
-            }
         }
 
         $data = self::checkOrder();
 
         $view = wa()->getView();
         $view->assign('wholesale', $data);
-        return $view->fetch($template_path);
+        return $view->fetch($templates['cart']['template_path']);
     }
 
     public static function checkMinProductCount(&$product_name = null, &$min_product_count = null) {

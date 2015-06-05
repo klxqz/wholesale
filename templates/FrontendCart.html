@@ -5,10 +5,10 @@
     }
 </style>
 <script>
-    (function($) {
+    (function ($) {
         $.wholesale_plugin = {
             options: {},
-            init: function(options) {
+            init: function (options) {
                 this.options = options;
                 if (!this.options.wholesale_check) {
                     this.locking();
@@ -16,30 +16,34 @@
                 this.submitForm();
                 this.checkInterval();
             },
-            locking: function() {
+            locking: function () {
                 $('input[name="checkout"]').hide();
                 $('.cart_wholesale').text(this.options.wholesale_message);
             },
-            unlocking: function() {
+            unlocking: function () {
                 $('input[name="checkout"]').show();
                 $('.cart_wholesale').text('');
             },
-            submitForm: function() {
-                self = this;
-                $('input[name="checkout"]').closest('form').submit(function() {
+            submitForm: function () {
+                var self = this;
+                $('input[name="checkout"]').closest('form').submit(function () {
                     if (!self.options.wholesale_check) {
                         return false;
                     }
                 });
-            }, checkInterval: function() {
-                self = this;
-                setInterval(function() {
+            },
+            checkInterval: function () {
+                var self = this;
+                setInterval(function () {
                     if (self.options.cart_total != $('.cart-total').text()) {
+                        $('.cart_wholesale').html('<i class="icon16 loading"></i>');
+                        $('input[name="checkout"]').attr('disabled', true);
                         $.ajax({
                             type: 'POST',
                             url: self.options.checkUrl,
                             dataType: 'json',
-                            success: function(data, textStatus, jqXHR) {
+                            success: function (data, textStatus, jqXHR) {
+                                $('input[name="checkout"]').removeAttr('disabled');
                                 self.options.wholesale_check = data.data.check.result;
                                 self.options.wholesale_message = data.data.check.message;
                                 if (data.data.check.result) {
@@ -53,11 +57,10 @@
                     }
                 }, 500);
             }
-
         };
     })(jQuery);
 
-    $(function() {
+    $(function () {
         $.wholesale_plugin.init({
             'checkUrl': '{$wa_app_url}wholesale/',
             'wholesale_check': {$wholesale.result},
