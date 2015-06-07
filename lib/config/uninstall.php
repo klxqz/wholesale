@@ -10,6 +10,13 @@ try {
 }
 
 try {
+    $model->query("SELECT `multiplicity` FROM `shop_product` WHERE 0");
+    $model->exec("ALTER TABLE `shop_product` DROP `multiplicity`");
+} catch (waDbException $e) {
+    
+}
+
+try {
     $model->query("SELECT `min_sum` FROM `shop_category` WHERE 0");
     $model->exec("ALTER TABLE `shop_category` DROP `min_sum`");
 } catch (waDbException $e) {

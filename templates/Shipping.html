@@ -33,7 +33,7 @@
                 });
             }, changeShipping: function () {
                 var self = this;
-                $('input[name=shipping_id]').change(function () {
+                $(document).on('click', 'input[name=shipping_id]', function () {
                     var shipping_id = $(this).val();
                     $('.shipping_wholesale').html('<i class="icon16 loading"></i>');
                     $('.checkout-form input[type="submit"]').attr('disabled', true);
@@ -62,7 +62,7 @@
     $(function () {
         $.wholesale_shipping_plugin.init({
             'checkUrl': '{$wa_app_url}wholesale/shipping/',
-            'wholesale_check': {$wholesale.result|default:1},
+            'wholesale_check': {if $wholesale.result|default:1}1{else}0{/if},
             'wholesale_message': '{$wholesale.message|default:''}'
         });
     });

@@ -103,7 +103,7 @@
                 <div class="field-group">
                     <div class="field">
                         <div class="name">
-                            Минимальное количество товаров
+                            Минимальное количество товаров в заказе
                         </div>
                         <div class="value">
                             <input type="text" name="domains_settings[{$domain_hash}][min_order_products]" value="{$setting.min_order_products|default:0|escape}"  /> шт.
@@ -122,26 +122,7 @@
                 <div class="field-group">
                     <div class="field">
                         <div class="name">
-                            Минимальная сумма заказа для категории. Текст сообщения.
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][min_order_sum_category_message]">{$setting.min_order_sum_category_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Минимальное количество товаров для категории. Текст сообщения.
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][min_order_count_category_message]">{$setting.min_order_count_category_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Использовать индвивидуальные настройки минимального количества для каждого товара
+                            Использовать индивидуальные настройки минимального количества для каждого товара
                         </div>
                         <div class="value">
                             <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_count_setting]" />
@@ -154,6 +135,69 @@
                         </div>
                         <div class="value">
                             <textarea name="domains_settings[{$domain_hash}][min_product_count_message]">{$setting.min_product_count_message|default:''|escape}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field">
+                        <div class="name">
+                            Использовать индивидуальные настройки кратности для каждого товара
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_multiplicity_setting]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_multiplicity_setting]" {if $setting.product_multiplicity_setting|default:1}checked="checked"{/if} />
+                        </div>
+                        <p class="hint">Кратность позволяет продавать товар кратно какому-либо значению. 
+                            Например, установленная кратность для товара равная 3, позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
+                            При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Текст сообщения
+                        </div>
+                        <div class="value">
+                            <textarea name="domains_settings[{$domain_hash}][multiplicity_product_message]">{$setting.multiplicity_product_message|default:''|escape}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field">
+                        <div class="name">
+                            Использовать индивидуальные настройки минимальной суммы заказа для категории.
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_sum_setting]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][category_sum_setting]" {if $setting.category_sum_setting|default:1}checked="checked"{/if} />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Текст сообщения
+                        </div>
+                        <div class="value">
+                            <textarea name="domains_settings[{$domain_hash}][min_order_sum_category_message]">{$setting.min_order_sum_category_message|default:''|escape}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field">
+                        <div class="name">
+                            Использовать индивидуальные настройки минимального количества товаров в заказе для категории.
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_count_setting]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][category_count_setting]" {if $setting.category_count_setting|default:1}checked="checked"{/if} />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Текст сообщения
+                        </div>
+                        <div class="value">
+                            <textarea name="domains_settings[{$domain_hash}][min_order_count_category_message]">{$setting.min_order_count_category_message|default:''|escape}</textarea>
                         </div>
                     </div>
                 </div>
@@ -220,7 +264,7 @@
                             Текст сообщения
                         </div>
                         <div class="value">
-                            <input type="text" class="long" name="domains_settings[{$domain_hash}][shipping_message]" value="{$setting.shipping_message|default:''|escape}"  />
+                            <textarea name="domains_settings[{$domain_hash}][shipping_message]">{$setting.shipping_message|default:''|escape}</textarea>
                         </div>
                     </div>
                 </div>

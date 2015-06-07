@@ -65,7 +65,7 @@
     $(function () {
         $.wholesale_plugin.init({
             'checkUrl': '{$wa_app_url}wholesale/',
-            'wholesale_check': {$wholesale.result},
+            'wholesale_check': {if $wholesale.result}1{else}0{/if},
             'wholesale_message': '{$wholesale.message}',
             'cart_total': $('.cart-total').text()
         });

@@ -7,8 +7,7 @@
 class shopWholesalePluginFrontendWholesaleController extends waJsonController {
 
     public function execute() {
-        $plugin = wa()->getPlugin('wholesale');
-        $check = $plugin->checkOrder();
+        $check = shopWholesale::checkOrder();
         $this->response['check'] = $check;
     }
 

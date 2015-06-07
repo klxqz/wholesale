@@ -3,6 +3,14 @@
 $model = new waModel();
 
 try {
+    $sql = 'SELECT `multiplicity` FROM `shop_product` WHERE 0';
+    $model->query($sql);
+} catch (waDbException $ex) {
+    $sql = 'ALTER TABLE `shop_product` ADD `multiplicity` INT NOT NULL AFTER `id`';
+    $model->query($sql);
+}
+
+try {
     $sql = 'SELECT `min_sum` FROM `shop_category` WHERE 0';
     $model->query($sql);
 } catch (waDbException $ex) {
@@ -17,3 +25,6 @@ try {
     $sql = 'ALTER TABLE `shop_category` ADD `min_product_count` INT NOT NULL AFTER `id`';
     $model->query($sql);
 }
+
+$domains_settings = array();
+shopWholesale::saveDomainsSettings($domains_settings);
