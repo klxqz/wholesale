@@ -131,7 +131,7 @@ class shopWholesale {
         $def_currency = wa('shop')->getConfig()->getCurrency(true);
         $cur_currency = wa('shop')->getConfig()->getCurrency(false);
 
-        $total = $cart->total(true);
+        $total = $cart->total(false);
         $total = shop_currency($total, $cur_currency, $def_currency, false);
         $min_order_sum = $domain_settings['min_order_sum'];
         $min_order_sum_format = shop_currency($min_order_sum);
@@ -177,7 +177,7 @@ class shopWholesale {
         $cart = new shopCart();
         $def_currency = wa('shop')->getConfig()->getCurrency(true);
         $cur_currency = wa('shop')->getConfig()->getCurrency(false);
-        $total = $cart->total(true);
+        $total = $cart->total(false);
         $total = shop_currency($total, $cur_currency, $def_currency, false);
 
         if (!empty($plugins[$shipping_id]) && $total < $plugins[$shipping_id]) {

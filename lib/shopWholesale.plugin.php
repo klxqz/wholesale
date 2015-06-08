@@ -95,7 +95,7 @@ class shopWholesalePlugin extends shopPlugin {
                 $cart = new shopCart();
                 $def_currency = wa('shop')->getConfig()->getCurrency(true);
                 $cur_currency = wa('shop')->getConfig()->getCurrency(false);
-                $total = $cart->total(true);
+                $total = $cart->total(false);
                 $total = shop_currency($total, $cur_currency, $def_currency, false);
 
                 if ($total < $plugins[$shipping_id]) {
