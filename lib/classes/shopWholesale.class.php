@@ -154,6 +154,12 @@ class shopWholesale {
         } elseif ($domain_settings['category_count_setting'] && !self::checkMinCategoryCount($category_name, $min_category_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['min_order_count_category_message'], $category_name, $min_category_count);
+        } elseif ($domain_settings['sku_count_setting'] && !self::checkMinSkuCount($product_name, $min_sku_count)) {
+            $return['result'] = false;
+            $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_sku_count);
+        } elseif ($domain_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkuCount($product_name, $multiplicity_sku_count)) {
+            $return['result'] = false;
+            $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
         } else {
             $return['result'] = true;
             $return['message'] = '';
@@ -373,6 +379,61 @@ class shopWholesale {
                 $product_name = $item['product']['name'];
                 $multiplicity_product_count = $item['product']['multiplicity'];
                 return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Проверка минимального количества заказанных продуктов для артикулов.
+     * Возвращает TRUE - если условие минимального количества для товара выполняется, FALSE - если условие не выполняется.
+     * 
+     * @param type $product_name - в эту переменную записывается имя товара, для которого условие минимального количества не выполняется.
+     * @param type $min_sku_count - в эту переменную записывается минимальное количество товара для выбранного артикула.
+     * @return boolean
+     */
+    public static function checkMinSkuCount(&$product_name = null, &$min_sku_count = null) {
+        $wholesale_model = new shopWholesalePluginModel();
+        $cart = new shopCart();
+        $items = $cart->items();
+        foreach ($items as $item) {
+            if ($item['type'] == 'product') {
+                $wholesale = $wholesale_model->where('product_id = ' . (int) $item['product_id'] . ' AND sku_id = ' . (int) $item['sku_id'])->fetch();
+                if (!empty($wholesale) && $item['quantity'] < $wholesale['min_sku_count']) {
+                    $product_name = $item['product']['name'];
+                    if (!empty($item['sku_name'])) {
+                        $product_name .= " (" . $item['sku_name'] . ")";
+                    }
+                    $min_sku_count = $wholesale['min_sku_count'];
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Проверка кратности количества заказанных продуктов для артикулов.
+     * Возвращает TRUE - если условие кратности количества для товара выполняется, FALSE - если условие не выполняется.
+     * 
+     * @param type $product_name - в эту переменную записывается имя товара, для которого условие кратности количества не выполняется.
+     * @param type $multiplicity_product_count - в эту переменную записывается кратность товара для артикула.
+     */
+    public static function checkMultiplicitySkuCount(&$product_name = null, &$multiplicity_sku_count = null) {
+        $wholesale_model = new shopWholesalePluginModel();
+        $cart = new shopCart();
+        $items = $cart->items();
+        foreach ($items as $item) {
+            if ($item['type'] == 'product') {
+                $wholesale = $wholesale_model->where('product_id = ' . (int) $item['product_id'] . ' AND sku_id = ' . (int) $item['sku_id'])->fetch();
+                if (!empty($wholesale) && $wholesale['multiplicity'] > 0 && $item['quantity'] % $wholesale['multiplicity'] != 0) {
+                    $product_name = $item['product']['name'];
+                    if (!empty($item['sku_name'])) {
+                        $product_name .= " (" . $item['sku_name'] . ")";
+                    }
+                    $multiplicity_sku_count = $wholesale['multiplicity'];
+                    return false;
+                }
             }
         }
         return true;

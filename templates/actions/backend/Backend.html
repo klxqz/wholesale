@@ -1,0 +1,85 @@
+<script type="text/javascript" src="{$wa_app_static_url}plugins/wholesale/js/wholesale.js"></script>
+<input type="hidden" name="wholesale_product_id" value="{$product.id}" />
+
+<div class="fields form">
+
+    <div class="field-group">
+        <div class="field">
+            <div class="name">
+                Минимальное количество заказываемого товара для артикулов
+            </div>
+            <div class="value">
+                <table id="wholesale-table" class="zebra" style="width: auto;">
+                    <thead>
+                    <th>Артикул</th>
+                    <th>Минимальное количество товара для заказа</th>
+                    <th>Кратность заказываемого товара</th>
+                    <th>Удалить</th>
+                    </thead>
+                    <tbody>
+                        {foreach $items as $item}
+                        <tr>
+                            <td class="min-width">
+                                <input type="hidden" name="wholesale_id[]" value="{$item.id}" />
+                                <select name="wholesale_sku[]">
+                                    {foreach $product.skus as $sku}
+                                    <option {if $item.sku_id == $sku.id}selected="selected"{/if} value="{$sku.id}">{$sku.sku|default:'По умолчанию'}{if $sku.name}({$sku.name}){/if}</option>
+                                    {/foreach}
+                                </select>
+                            </td>
+                            <td class="min-width">
+                                <input type="text" value="{$item.min_sku_count}" class="large bold" name="wholesale_min_sku_count[]">
+                            </td>
+                            <td class="min-width">
+                                <input type="text" value="{$item.multiplicity}" class="large bold" name="wholesale_multiplicity[]">
+                            </td>
+                            <td>
+                                <a class="delete-row" href="#"><i class="icon16 delete"></i></a>
+                            </td>
+                        </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+                <a class="inline-link add-row" href="#"><i class="icon16 add"></i><b><i>Добавить</i></b></a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-plugins/jquery.tmpl.min.js"></script>
+{literal}
+<script id="wholesale-tmpl" type="text/x-jquery-tmpl">
+    <tr>
+    <td class="min-width">
+    <input type="hidden" name="wholesale_id[]" value="" />
+    <select name="wholesale_sku[]">
+    {{each skus}}
+    <option value="${$value.id}">{{if $value.sku}}${$value.sku}{{else}}По умолчанию{{/if}}{{if $value.name}}(${$value.name}){{/if}}</option>
+    {{/each}}
+    </select>
+    </td>
+    <td class="min-width">
+    <input type="text" value="" class="large bold" name="wholesale_min_sku_count[]">
+    </td>
+    <td class="min-width">
+    <input type="text" value="" class="large bold" name="wholesale_multiplicity[]">
+    </td>
+    <td>
+    <a class="delete-row" href="#"><i class="icon16 delete"></i></a>
+    </td>
+    </tr>
+</script>
+{/literal}
+<script type="text/javascript">
+            $.product_wholesale.init({
+            container: '.s-product-form.wholesale',
+                    counter: '#s-product-edit-menu li.wholesale span.hint',
+                    product_id: {$product.id},
+                    currency: '{$product.currency}',
+                    skus: {json_encode($product.skus)}
+            });
+</script>

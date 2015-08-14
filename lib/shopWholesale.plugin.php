@@ -15,8 +15,10 @@ class shopWholesalePlugin extends shopPlugin {
         'min_order_products' => 0,
         'min_order_products_message' => 'Вы не можете оформить заказ т.к. количество товаров в Вашей корзине меньше минимального. Минимальное количество товаров %s шт.',
         'product_count_setting' => 1,
+        'sku_count_setting' => 1,
         'min_product_count_message' => 'Вы не можете оформить заказ т.к. количество товара "%s" в Вашей корзине меньше минимального. Минимальное количество товара %s шт.',
         'product_multiplicity_setting' => 1,
+        'sku_multiplicity_setting' => 1,
         'multiplicity_product_message' => 'Количество товара "%s" в Вашей корзине должно быть кратно %s шт.',
         'category_sum_setting' => 1,
         'min_order_sum_category_message' => 'Вы не можете оформить заказ т.к. сумма Вашего заказа для категории "%s" меньше минимальной. Минимальная сумма заказа %s',
@@ -42,6 +44,15 @@ class shopWholesalePlugin extends shopPlugin {
             )
         )
     );
+
+    public function backendProduct($product) {
+        if ($this->getSettings('status')) {
+            $view = wa()->getView();
+            $view->assign('product', $product);
+            $html = $view->fetch('plugins/wholesale/templates/BackendProduct.html');
+            return array('edit_section_li' => $html);
+        }
+    }
 
     public function backendProductEdit($product) {
         if ($this->getSettings('status')) {

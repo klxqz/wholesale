@@ -24,7 +24,7 @@
 </ul>
 <h1>Минимальный заказ</h1>
 <div class="fields form">
-    <form action="?plugin=wholesale&action=save" method="post" id="plugins-settings-form">
+    <form action="?plugin=wholesale&action=saveSettings" method="post" id="plugins-settings-form">
         {$wa->csrf()}
         <div class="field-group">
             <div class="field">
@@ -131,6 +131,15 @@
                     </div>
                     <div class="field">
                         <div class="name">
+                            Использовать индивидуальные настройки минимального количества для каждого артикула
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][sku_count_setting]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][sku_count_setting]" {if $setting.sku_count_setting|default:1}checked="checked"{/if} />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="name">
                             Текст сообщения
                         </div>
                         <div class="value">
@@ -150,6 +159,18 @@
                         </div>
                         <p class="hint">Кратность позволяет продавать товар кратно какому-либо значению. 
                             Например, установленная кратность для товара равная 3, позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
+                            При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
+                    </div>
+                    <div class="field">
+                        <div class="name">
+                            Использовать индивидуальные настройки кратности для каждого артикула
+                        </div>
+                        <div class="value">
+                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][sku_multiplicity_setting]" />
+                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][sku_multiplicity_setting]" {if $setting.sku_multiplicity_setting|default:1}checked="checked"{/if} />
+                        </div>
+                        <p class="hint">Кратность позволяет продавать товар(артикул) кратно какому-либо значению. 
+                            Например, установленная кратность для артикула равная 3, позволяет заказать артикул в количестве 3шт., 6шт., 9шт. и тд. 
                             При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
                     </div>
                     <div class="field">

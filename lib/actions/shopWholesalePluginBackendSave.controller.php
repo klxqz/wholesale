@@ -1,30 +1,33 @@
 <?php
 
-/**
- * @author wa-plugins.ru <support@wa-plugins.ru>
- * @link http://wa-plugins.ru/
- */
 class shopWholesalePluginBackendSaveController extends waJsonController {
 
     public function execute() {
-        try {
-            $app_settings_model = new waAppSettingsModel();
-            $settings = waRequest::post('shop_wholesale', array());
-            $domains_settings = waRequest::post('domains_settings', array());
-            $reset = waRequest::post('reset');
-            foreach ($settings as $name => $value) {
-                $app_settings_model->set(shopWholesalePlugin::$plugin_id, $name, $value);
-            }
-            if ($reset) {
-                $domains_settings = array();
-            }
-            shopWholesale::saveDomainsSettings($domains_settings);
+        $product_id = waRequest::post('wholesale_product_id');
+        $wholesale_id = waRequest::post('wholesale_id', array());
+        $wholesale_sku = waRequest::post('wholesale_sku', array());
+        $wholesale_min_sku_count = waRequest::post('wholesale_min_sku_count', array());
+        $wholesale_multiplicity = waRequest::post('wholesale_multiplicity', array());
 
 
-            $this->response['message'] = "Сохранено";
-        } catch (Exception $e) {
-            $this->setError($e->getMessage());
+        $wholesale_model = new shopWholesalePluginModel();
+        $items = array();
+        foreach ($wholesale_id as $key => $id) {
+            $item = array(
+                'id' => $id,
+                'product_id' => $product_id,
+                'sku_id' => $wholesale_sku[$key],
+                'min_sku_count' => $wholesale_min_sku_count[$key],
+                'multiplicity' => $wholesale_multiplicity[$key],
+            );
+            if (empty($item['id'])) {
+                $item['id'] = $wholesale_model->insert($item);
+            } else {
+                $wholesale_model->updateById($item['id'], $item);
+            }
+            $items[] = $item;
         }
+        $this->response['items'] = $items;
     }
 
 }
