@@ -251,9 +251,9 @@ class shopWholesale {
 
         $category_model = new shopCategoryModel();
         $category = $category_model->getById($category_id);
-        if ($category['min_product_count'] > 0) {
+        if ($category['wholesale_min_product_count'] > 0) {
             $category_name = $category['name'];
-            return $category['min_product_count'];
+            return $category['wholesale_min_product_count'];
         } elseif ($category['parent_id']) {
             return self::getCategoryMinCount($category['parent_id'], $category_name);
         }
@@ -315,9 +315,9 @@ class shopWholesale {
     public static function getCategoryMinSum($category_id, &$category_name) {
         $category_model = new shopCategoryModel();
         $category = $category_model->getById($category_id);
-        if ($category['min_sum'] > 0) {
+        if ($category['wholesale_min_sum'] > 0) {
             $category_name = $category['name'];
-            return $category['min_sum'];
+            return $category['wholesale_min_sum'];
         } elseif ($category['parent_id']) {
             return self::getCategoryMinSum($category['parent_id'], $category_name);
         }
@@ -355,9 +355,9 @@ class shopWholesale {
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
-            if ($item['type'] == 'product' && $item['quantity'] < $item['product']['min_product_count']) {
+            if ($item['type'] == 'product' && $item['quantity'] < $item['product']['wholesale_min_product_count']) {
                 $product_name = $item['product']['name'];
-                $min_product_count = $item['product']['min_product_count'];
+                $min_product_count = $item['product']['wholesale_min_product_count'];
                 return false;
             }
         }
@@ -375,9 +375,9 @@ class shopWholesale {
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
-            if ($item['type'] == 'product' && $item['product']['multiplicity'] > 0 && $item['quantity'] % $item['product']['multiplicity'] != 0) {
+            if ($item['type'] == 'product' && $item['product']['wholesale_multiplicity'] > 0 && $item['quantity'] % $item['product']['wholesale_multiplicity'] != 0) {
                 $product_name = $item['product']['name'];
-                $multiplicity_product_count = $item['product']['multiplicity'];
+                $multiplicity_product_count = $item['product']['wholesale_multiplicity'];
                 return false;
             }
         }

@@ -3,7 +3,7 @@
 <div class="field">
     <div class="name">Минимальная сумма всех товаров из этой категории и подкатегорий для осуществления заказа</div>
     <div class="value no-shift">
-        <input type="text" name="min_sum" value="{$category.min_sum|escape}" class="bold numerical small">
+        <input type="text" name="wholesale_min_sum" value="{$category.wholesale_min_sum|escape}" class="bold numerical small">
         <p class="hint">
             Если покупатель добавил себе в корзину товары из этой категории или подкатегорий, 
             то, для осуществления заказа, суммарная стоимость товаров из этой категории или подкатегорий не должна быть меньше установленного значения. 
@@ -16,7 +16,7 @@
 <div class="field">
     <div class="name">Минимальное количество всех товаров из этой категории и подкатегорий для осуществления заказа</div>
     <div class="value no-shift">
-        <input type="text" name="min_product_count" value="{$category.min_product_count|escape}" class="bold numerical small">
+        <input type="text" name="wholesale_min_product_count" value="{$category.wholesale_min_product_count|escape}" class="bold numerical small">
         <p class="hint">
             Если покупатель добавил себе в корзину товары из этой категории или подкатегорий, 
             то, для осуществления заказа, суммарное количество товаров из этой категории или подкатегорий не должно быть меньше установленного значения. 
@@ -29,7 +29,7 @@
 
 <script type="text/javascript">
     $(function () {
-        $('input[name="min_sum"], input[name="min_product_count"]').change(function () {
+        $('input[name="wholesale_min_sum"], input[name="wholesale_min_product_count"]').change(function () {
             $.ajax({
                 url: "?plugin=wholesale&action=saveCategory",
                 dataType: 'json',

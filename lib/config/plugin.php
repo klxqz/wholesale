@@ -9,7 +9,7 @@ return array(
     'description' => 'Ограничение минимального заказа',
     'img' => 'img/wholesale.png',
     'vendor' => '985310',
-    'version' => '3.2.0',
+    'version' => '3.2.1',
     'rights' => false,
     'frontend' => true,
     'shop_settings' => true,

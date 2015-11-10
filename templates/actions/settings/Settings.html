@@ -35,10 +35,8 @@
                     Статус плагина
                 </div>
                 <div class="value">
-                    <select name="shop_wholesale[status]">
-                        <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
-                        <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
-                    </select>
+                    <input type="hidden" name="shop_wholesale[status]" value="0">
+                    <input type="checkbox" class="ibutton-status" name="shop_wholesale[status]" value="1"{if $settings.status} checked{/if}>  
                 </div>
             </div>
         </div>
@@ -51,281 +49,282 @@
                 {$setting = $domain_settings[$domain_hash]}
                 {$templates = $setting.templates}
 
-                <h2>Поселение: {$domain_route}</h2>
+                <div class="domain-route"{if empty($settings.status)} style="display:none;"{/if}>
 
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Статус плагина для поселения
-                        </div>
-                        <div class="value">
-                            <select name="domains_settings[{$domain_hash}][status]">
-                                <option {if $setting.status|default:1 == 1} selected="selected"{/if} value="1">Включен</option>
-                                <option {if $setting.status|default:1 == 0} selected="selected"{/if} value="0">Выключен</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Redirect. Перенаправление (дополнительная защита).
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][redirect]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][redirect]" {if $setting.redirect|default:1}checked="checked"{/if} />
-                            <p class="hint">Если опция включена, тогда осуществляется перенаправление со страниц оформления заказа на страницу корзины. 
-                                Данная опция позволяет предотвратить прямые переходы к оформления заказа минуя корзину, в обход проверки минимального заказа. 
-                                Данная опция вызывает циклическую переадресацию и должна быть отключена, если у вас дополнительно установлен плагин 
-                                <a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/onestep/">"Заказ на одной странице"</a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Минимальная сумма заказа
-                        </div>
-                        <div class="value">
-                            <input type="text" name="domains_settings[{$domain_hash}][min_order_sum]" value="{$setting.min_order_sum|default:0|escape}"  /> {$currency}
+                    <div class="field-group">
+                        <h2>Поселение: {$domain_route}</h2>
+                        <div class="field">
+                            <div class="name">
+                                Статус плагина для поселения
+                            </div>
+                            <div class="value">
+                                <input type="hidden" class="ibutton-status" name="domains_settings[{$domain_hash}][status]" value="0">  
+                                <input type="checkbox" class="ibutton-status" name="domains_settings[{$domain_hash}][status]" value="1"{if $setting.status} checked{/if}>  
+                            </div>
                         </div>
                     </div>
 
-                    <div class="field">
-                        <div class="name">
-                            Текст сообщения
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Redirect. Перенаправление (дополнительная защита).
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][redirect]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][redirect]" {if $setting.redirect|default:1}checked="checked"{/if} />
+                                <p class="hint">Если опция включена, тогда осуществляется перенаправление со страниц оформления заказа на страницу корзины. 
+                                    Данная опция позволяет предотвратить прямые переходы к оформления заказа минуя корзину, в обход проверки минимального заказа. 
+                                    Данная опция вызывает циклическую переадресацию и должна быть отключена, если у вас дополнительно установлен плагин 
+                                    <a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/onestep/">"Заказ на одной странице"</a>
+                                </p>
+                            </div>
                         </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][min_order_sum_message]">{$setting.min_order_sum_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Минимальное количество товаров в заказе
-                        </div>
-                        <div class="value">
-                            <input type="text" name="domains_settings[{$domain_hash}][min_order_products]" value="{$setting.min_order_products|default:0|escape}"  /> шт.
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Текст сообщения
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][min_order_products_message]">{$setting.min_order_products_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Использовать индивидуальные настройки минимального количества для каждого товара
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_count_setting]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_count_setting]" {if $setting.product_count_setting|default:1}checked="checked"{/if} />
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Использовать индивидуальные настройки минимального количества для каждого артикула
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][sku_count_setting]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][sku_count_setting]" {if $setting.sku_count_setting|default:1}checked="checked"{/if} />
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Текст сообщения
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][min_product_count_message]">{$setting.min_product_count_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Использовать индивидуальные настройки кратности для каждого товара
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_multiplicity_setting]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_multiplicity_setting]" {if $setting.product_multiplicity_setting|default:1}checked="checked"{/if} />
-                        </div>
-                        <p class="hint">Кратность позволяет продавать товар кратно какому-либо значению. 
-                            Например, установленная кратность для товара равная 3, позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
-                            При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Использовать индивидуальные настройки кратности для каждого артикула
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][sku_multiplicity_setting]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][sku_multiplicity_setting]" {if $setting.sku_multiplicity_setting|default:1}checked="checked"{/if} />
-                        </div>
-                        <p class="hint">Кратность позволяет продавать товар(артикул) кратно какому-либо значению. 
-                            Например, установленная кратность для артикула равная 3, позволяет заказать артикул в количестве 3шт., 6шт., 9шт. и тд. 
-                            При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Текст сообщения
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][multiplicity_product_message]">{$setting.multiplicity_product_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Использовать индивидуальные настройки минимальной суммы заказа для категории.
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_sum_setting]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][category_sum_setting]" {if $setting.category_sum_setting|default:1}checked="checked"{/if} />
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Текст сообщения
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][min_order_sum_category_message]">{$setting.min_order_sum_category_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Использовать индивидуальные настройки минимального количества товаров в заказе для категории.
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_count_setting]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][category_count_setting]" {if $setting.category_count_setting|default:1}checked="checked"{/if} />
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Текст сообщения
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][min_order_count_category_message]">{$setting.min_order_count_category_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Вывод в стандартном месте (хук frontend_cart)
-                        </div>
-                        <div class="value">
-                            <input type="hidden" value="0" name="domains_settings[{$domain_hash}][default_output]" />
-                            <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][default_output]" {if $setting.default_output|default:1}checked="checked"{/if} />
-                            или используйте хелпер вывода <b>{literal}{shopWholesalePlugin::display()}{/literal}</b>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <div class="name">
-                            Настройки минимального заказа для различных способов доставки
-                        </div>
-                        <div class="value">
-                            <table class="zebra" id="s-settings-shipping">
-                                <thead>
-                                <th></th>
-                                <th>Способ доставки</th>
-                                <th>Минимальная сумма заказа</th>
-                                </thead>
-                                <tbody>
-                                    {foreach $instances as $id => $plugin}
-                                        <tr data-id="{$id}">
-                                            <td class="min-width">
-                                                {if !empty($plugin.logo)}
-                                                    <img src="{$plugin.logo}">
-                                                {elseif !empty($plugin.img)}
-                                                    <img src="{$plugin.img}">
-                                                {/if}
-                                            </td>
-                                            <td style="width:30%">
-                                                <h3 class="large{if empty($plugin.status)} gray{/if}">
-                                                    {$plugin.name|escape}
-                                                    {if empty($plugin.status)}([`disabled`]){/if}
-                                                </h3>
-                                                <p class="hint">{strip_tags($plugin.description)}</p>
-                                            </td>
-                                            <td>
-                                                <input type="text" name="domains_settings[{$domain_hash}][plugins][{$id}]" value="{$setting.plugins[$id]|escape|default:0}" /> {$currency}
-                                            </td>
-                                        </tr>
-                                    {foreachelse}
-                                        <tr>
-                                            <td>
-                                                <em class="gray">[`No shipping options are defined.`]</em>
-                                            </td>
-                                        </tr>
-                                    {/foreach}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">
-                            Текст сообщения
-                        </div>
-                        <div class="value">
-                            <textarea name="domains_settings[{$domain_hash}][shipping_message]">{$setting.shipping_message|default:''|escape}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <div class="field">
-                        <a class="edit-templates" href="#"><i class="icon16 edit"></i>Шаблоны</a>
                     </div>
 
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Минимальная сумма заказа
+                            </div>
+                            <div class="value">
+                                <input type="text" name="domains_settings[{$domain_hash}][min_order_sum]" value="{$setting.min_order_sum|default:0|escape}"  /> {$currency}
+                            </div>
+                        </div>
 
-                    <div class="templates-block">
-                        {foreach from=$templates key=key item=template}
-                            {$count = array_push($tpls,"'sf-template-`$key`-`$domain_hash`'")}
-                            <div class="field">
-                                <div class="name">
-                                    {$template.name}<br /><span class="hint">HTML + Smarty</span>
-                                </div>
-                                <div class="value no-shift">
-                                    <a class="edit-template" href="#"><i class="icon16 edit"></i>Изменить шаблон</a>
-                                    <div class="template-block">
-                                        <textarea id="sf-template-{$key}-{$domain_hash}"  class="body" name="domains_settings[{$domain_hash}][templates][{$key}][template]">{$template.template|escape}</textarea>
+                        <div class="field">
+                            <div class="name">
+                                Текст сообщения
+                            </div>
+                            <div class="value">
+                                <textarea name="domains_settings[{$domain_hash}][min_order_sum_message]">{$setting.min_order_sum_message|default:''|escape}</textarea>
+                            </div>
+                        </div>
+                    </div>
 
-                                        {if $template.change_tpl}
-                                            <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
-                                            <input type="checkbox" name="domains_settings[{$domain_hash}][templates][{$key}][reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
-                                        {/if}
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Минимальное количество товаров в заказе
+                            </div>
+                            <div class="value">
+                                <input type="text" name="domains_settings[{$domain_hash}][min_order_products]" value="{$setting.min_order_products|default:0|escape}"  /> шт.
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Текст сообщения
+                            </div>
+                            <div class="value">
+                                <textarea name="domains_settings[{$domain_hash}][min_order_products_message]">{$setting.min_order_products_message|default:''|escape}</textarea>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Использовать индивидуальные настройки минимального количества для каждого товара
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_count_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_count_setting]" {if $setting.product_count_setting|default:1}checked="checked"{/if} />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Использовать индивидуальные настройки минимального количества для каждого артикула
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][sku_count_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][sku_count_setting]" {if $setting.sku_count_setting|default:1}checked="checked"{/if} />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Текст сообщения
+                            </div>
+                            <div class="value">
+                                <textarea name="domains_settings[{$domain_hash}][min_product_count_message]">{$setting.min_product_count_message|default:''|escape}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Использовать индивидуальные настройки кратности для каждого товара
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_multiplicity_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_multiplicity_setting]" {if $setting.product_multiplicity_setting|default:1}checked="checked"{/if} />
+                            </div>
+                            <p class="hint">Кратность позволяет продавать товар кратно какому-либо значению. 
+                                Например, установленная кратность для товара равная 3, позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
+                                При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Использовать индивидуальные настройки кратности для каждого артикула
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][sku_multiplicity_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][sku_multiplicity_setting]" {if $setting.sku_multiplicity_setting|default:1}checked="checked"{/if} />
+                            </div>
+                            <p class="hint">Кратность позволяет продавать товар(артикул) кратно какому-либо значению. 
+                                Например, установленная кратность для артикула равная 3, позволяет заказать артикул в количестве 3шт., 6шт., 9шт. и тд. 
+                                При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Текст сообщения
+                            </div>
+                            <div class="value">
+                                <textarea name="domains_settings[{$domain_hash}][multiplicity_product_message]">{$setting.multiplicity_product_message|default:''|escape}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Использовать индивидуальные настройки минимальной суммы заказа для категории.
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_sum_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][category_sum_setting]" {if $setting.category_sum_setting|default:1}checked="checked"{/if} />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Текст сообщения
+                            </div>
+                            <div class="value">
+                                <textarea name="domains_settings[{$domain_hash}][min_order_sum_category_message]">{$setting.min_order_sum_category_message|default:''|escape}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Использовать индивидуальные настройки минимального количества товаров в заказе для категории.
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_count_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][category_count_setting]" {if $setting.category_count_setting|default:1}checked="checked"{/if} />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Текст сообщения
+                            </div>
+                            <div class="value">
+                                <textarea name="domains_settings[{$domain_hash}][min_order_count_category_message]">{$setting.min_order_count_category_message|default:''|escape}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Вывод в стандартном месте (хук frontend_cart)
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][default_output]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][default_output]" {if $setting.default_output|default:1}checked="checked"{/if} />
+                                или используйте хелпер вывода <b>{literal}{shopWholesalePlugin::display()}{/literal}</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Настройки минимального заказа для различных способов доставки
+                            </div>
+                            <div class="value">
+                                <table class="zebra" id="s-settings-shipping">
+                                    <thead>
+                                    <th></th>
+                                    <th>Способ доставки</th>
+                                    <th>Минимальная сумма заказа</th>
+                                    </thead>
+                                    <tbody>
+                                        {foreach $instances as $id => $plugin}
+                                            <tr data-id="{$id}">
+                                                <td class="min-width">
+                                                    {if !empty($plugin.logo)}
+                                                        <img src="{$plugin.logo}">
+                                                    {elseif !empty($plugin.img)}
+                                                        <img src="{$plugin.img}">
+                                                    {/if}
+                                                </td>
+                                                <td style="width:30%">
+                                                    <h3 class="large{if empty($plugin.status)} gray{/if}">
+                                                        {$plugin.name|escape}
+                                                        {if empty($plugin.status)}([`disabled`]){/if}
+                                                    </h3>
+                                                    <p class="hint">{strip_tags($plugin.description)}</p>
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="domains_settings[{$domain_hash}][plugins][{$id}]" value="{$setting.plugins[$id]|escape|default:0}" /> {$currency}
+                                                </td>
+                                            </tr>
+                                        {foreachelse}
+                                            <tr>
+                                                <td>
+                                                    <em class="gray">[`No shipping options are defined.`]</em>
+                                                </td>
+                                            </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Текст сообщения
+                            </div>
+                            <div class="value">
+                                <textarea name="domains_settings[{$domain_hash}][shipping_message]">{$setting.shipping_message|default:''|escape}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <a class="edit-templates" href="#"><i class="icon16 edit"></i>Шаблоны</a>
+                        </div>
+
+
+                        <div class="templates-block">
+                            {foreach from=$templates key=key item=template}
+                                {$count = array_push($tpls,"'sf-template-`$key`-`$domain_hash`'")}
+                                <div class="field">
+                                    <div class="name">
+                                        {$template.name}<br /><span class="hint">HTML + Smarty</span>
+                                    </div>
+                                    <div class="value no-shift">
+                                        <a class="edit-template" href="#"><i class="icon16 edit"></i>Изменить шаблон</a>
+                                        <div class="template-block">
+                                            <textarea id="sf-template-{$key}-{$domain_hash}"  class="body" name="domains_settings[{$domain_hash}][templates][{$key}][template]">{$template.template|escape}</textarea>
+
+                                            {if $template.change_tpl}
+                                                <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+                                                <input type="checkbox" name="domains_settings[{$domain_hash}][templates][{$key}][reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+                                            {/if}
+
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {/foreach}
+                            {/foreach}
+                        </div>
+                        <hr />
                     </div>
+
+
                 </div>
 
-
-
-                <hr>
             {/foreach}
         {/foreach}
 
@@ -349,6 +348,19 @@
 
 <script type="text/javascript">
     $(function () {
+        $('.ibutton-status').iButton({
+            labelOn: "", labelOff: "", className: 'mini'
+        }).change(function () {
+            var self = $(this);
+            var enabled = self.is(':checked');
+            if (enabled) {
+                self.closest('.field-group').siblings().show(200);
+            } else {
+                self.closest('.field-group').siblings().hide(200);
+            }
+            var f = $("#plugins-settings-form");
+            $.post(f.attr('action'), f.serialize());
+        });
 
         var ids = [{implode(',', $tpls)}];
         for (var i = 0; i < ids.length; i++) {

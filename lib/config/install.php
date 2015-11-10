@@ -7,33 +7,33 @@ $app_settings_model->set($plugin_id, 'status', '1');
 
 $model = new waModel();
 try {
-    $sql = 'SELECT `min_product_count` FROM `shop_product` WHERE 0';
+    $sql = 'SELECT `wholesale_min_product_count` FROM `shop_product` WHERE 0';
     $model->query($sql);
 } catch (waDbException $ex) {
-    $sql = 'ALTER TABLE `shop_product` ADD `min_product_count` INT NOT NULL AFTER `id`';
+    $sql = 'ALTER TABLE `shop_product` ADD `wholesale_min_product_count` INT NOT NULL AFTER `id`';
     $model->query($sql);
 }
 
 try {
-    $sql = 'SELECT `multiplicity` FROM `shop_product` WHERE 0';
+    $sql = 'SELECT `wholesale_multiplicity` FROM `shop_product` WHERE 0';
     $model->query($sql);
 } catch (waDbException $ex) {
-    $sql = 'ALTER TABLE `shop_product` ADD `multiplicity` INT NOT NULL AFTER `id`';
+    $sql = 'ALTER TABLE `shop_product` ADD `wholesale_multiplicity` INT NOT NULL AFTER `id`';
     $model->query($sql);
 }
 
 try {
-    $sql = 'SELECT `min_sum` FROM `shop_category` WHERE 0';
+    $sql = 'SELECT `wholesale_min_sum` FROM `shop_category` WHERE 0';
     $model->query($sql);
 } catch (waDbException $ex) {
-    $sql = 'ALTER TABLE `shop_category` ADD `min_sum` DECIMAL( 15, 4 ) NOT NULL AFTER `id`';
+    $sql = 'ALTER TABLE `shop_category` ADD `wholesale_min_sum` DECIMAL( 15, 4 ) NOT NULL AFTER `id`';
     $model->query($sql);
 }
 
 try {
-    $sql = 'SELECT `min_product_count` FROM `shop_category` WHERE 0';
+    $sql = 'SELECT `wholesale_min_product_count` FROM `shop_category` WHERE 0';
     $model->query($sql);
 } catch (waDbException $ex) {
-    $sql = 'ALTER TABLE `shop_category` ADD `min_product_count` INT NOT NULL AFTER `id`';
+    $sql = 'ALTER TABLE `shop_category` ADD `wholesale_min_product_count` INT NOT NULL AFTER `id`';
     $model->query($sql);
 }

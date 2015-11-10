@@ -59,13 +59,13 @@ class shopWholesalePlugin extends shopPlugin {
             $html = '<div class="field">
                         <div class="name">Минимальное количество товара для заказа</div>
                         <div class="value no-shift">
-                            <input type="text" name="product[min_product_count]" value="' . $product->min_product_count . '" class="bold numerical small">
+                            <input type="text" name="product[wholesale_min_product_count]" value="' . $product->wholesale_min_product_count . '" class="bold numerical small">
                         </div>
                     </div>
                     <div class="field">
                         <div class="name">Кратность заказываемого товара</div>
                         <div class="value no-shift">
-                            <input type="text" name="product[multiplicity]" value="' . $product->multiplicity . '" class="bold numerical small">
+                            <input type="text" name="product[wholesale_multiplicity]" value="' . $product->wholesale_multiplicity . '" class="bold numerical small">
                         </div>
                     </div>';
             return array('basics' => $html);
@@ -99,7 +99,6 @@ class shopWholesalePlugin extends shopPlugin {
         $data = wa()->getStorage()->get('shop/checkout');
         $plugins = $domain_settings['plugins'];
         $templates = $domain_settings['templates'];
-
         if (!empty($data['shipping']['id'])) {
             $shipping_id = $data['shipping']['id'];
             if (!empty($plugins[$shipping_id])) {
@@ -114,7 +113,6 @@ class shopWholesalePlugin extends shopPlugin {
                     $current_step_key = array_search($param['step'], $steps);
                     $shipping_step_key = array_search('shipping', $steps);
 
-
                     if ($param['step'] == 'shipping') {
                         $message = sprintf($domain_settings['shipping_message'], shop_currency($plugins[$shipping_id]));
 
@@ -127,6 +125,12 @@ class shopWholesalePlugin extends shopPlugin {
                     }
                 }
             }
+        } 
+        
+        if ($param['step'] == 'shipping') {
+            $view = wa()->getView();
+            $view->assign('wholesale', array('result' => 1, 'message' => ''));
+            return $view->fetch($templates['shipping']['template_path']);
         }
     }
 
