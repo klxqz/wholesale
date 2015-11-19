@@ -36,7 +36,7 @@
                 $(document).on('click', 'input[name=shipping_id]', function () {
                     var shipping_id = $(this).val();
                     $('.shipping_wholesale').html('<i class="icon16 loading"></i>');
-                    $('.checkout-form input[type="submit"]').attr('disabled', true);
+                    $('.checkout-form .checkout-step-content:not(.auth) input[type="submit"]').attr('disabled', true);
                     $.ajax({
                         type: 'POST',
                         url: self.options.checkUrl,
@@ -45,7 +45,7 @@
                             'shipping_id': shipping_id
                         },
                         success: function (data, textStatus, jqXHR) {
-                            $('.checkout-form input[type="submit"]').removeAttr('disabled');
+                            $('.checkout-form .checkout-step-content:not(.auth) input[type="submit"]').removeAttr('disabled');
                             self.options.wholesale_check = data.data.check.result;
                             self.options.wholesale_message = data.data.check.message;
                             if (data.data.check.result) {
