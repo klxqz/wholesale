@@ -31,6 +31,12 @@ class shopWholesale {
                     if (empty($domains_settings[$domain_route])) {
                         $domains_settings[$domain_route] = shopWholesalePlugin::$default_settings;
                     }
+                    foreach (shopWholesalePlugin::$default_settings as $key => $value) {
+                        if (!isset($domains_settings[$domain_route][$key])) {
+                            $domains_settings[$domain_route][$key] = $value;
+                        }
+                    }
+
                     foreach (shopWholesalePlugin::$default_settings['templates'] as $tpl_name => $tpl) {
                         $domains_settings[$domain_route]['templates'][$tpl_name] = $tpl;
 
@@ -113,7 +119,24 @@ class shopWholesale {
     public static function getDomainSettings() {
         $domains_settings = self::getDomainsSettings();
         $hash = self::getRouteHash();
-        return $domains_settings[$hash];
+
+        $domain_settings = array();
+        if (!empty($domains_settings[$hash])) {
+            $domain_settings = $domains_settings[$hash];
+        } else {
+            $domain_settings = shopWholesalePlugin::$default_settings;
+            foreach ($domain_settings['templates'] as $tpl_name => $tpl) {
+                $domain_settings['templates'][$tpl_name] = $tpl;
+
+                $domain_settings['templates'][$tpl_name]['tpl_full_path'] = $tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
+                $template_path = wa()->getAppPath($tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'], 'shop');
+                $domain_settings['templates'][$tpl_name]['template_path'] = $template_path;
+                $domain_settings['templates'][$tpl_name]['template'] = file_get_contents($template_path);
+                $domain_settings['templates'][$tpl_name]['change_tpl'] = 0;
+            }
+        }
+
+        return $domain_settings;
     }
 
     /**
@@ -351,7 +374,7 @@ class shopWholesale {
      * @param type $min_product_count - в эту переменную записывается минимальное количество товара.
      * @return boolean
      */
-    public static function checkMinProductCount(&$product_name = null, &$min_product_count = null) {
+    public static function checkMinProductCount(&$product_name = null, &$min_product_count = null, &$item = null) {
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
@@ -361,6 +384,7 @@ class shopWholesale {
                 return false;
             }
         }
+        unset($item);
         return true;
     }
 
@@ -371,7 +395,7 @@ class shopWholesale {
      * @param type $product_name - в эту переменную записывается имя товара, для которого условие кратности количества не выполняется.
      * @param type $multiplicity_product_count - в эту переменную записывается кратность товара.
      */
-    public static function checkMultiplicityProductCount(&$product_name = null, &$multiplicity_product_count = null) {
+    public static function checkMultiplicityProductCount(&$product_name = null, &$multiplicity_product_count = null, &$item = null) {
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
@@ -381,6 +405,7 @@ class shopWholesale {
                 return false;
             }
         }
+        unset($item);
         return true;
     }
 
@@ -392,7 +417,7 @@ class shopWholesale {
      * @param type $min_sku_count - в эту переменную записывается минимальное количество товара для выбранного артикула.
      * @return boolean
      */
-    public static function checkMinSkuCount(&$product_name = null, &$min_sku_count = null) {
+    public static function checkMinSkuCount(&$product_name = null, &$min_sku_count = null, &$item = null) {
         $wholesale_model = new shopWholesalePluginModel();
         $cart = new shopCart();
         $items = $cart->items();
@@ -409,6 +434,7 @@ class shopWholesale {
                 }
             }
         }
+        unset($item);
         return true;
     }
 

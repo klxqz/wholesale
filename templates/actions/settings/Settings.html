@@ -21,9 +21,9 @@
     }
 </style>
 <ul class="plugin-menu">
-    <li><a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/wholesale/reviews/">Оставить отзыв о плагине</a></li>
-    <li><a href="mailto:support@wa-plugins.ru">Поддержка разработчика плагина</a></li>
-    <li><a target="_blank" href="http://wa-plugins.ru/">WA-PLUGINS.ru - сайт разработчика</a></li>
+    <li><a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/wholesale/reviews/"><i class="icon16 star"></i>Оставить отзыв о плагине</a></li>
+    <li><a href="mailto:support@wa-plugins.ru"><i class="icon16 ss pt hammer"></i>Поддержка</a></li>
+    <li><a target="_blank" href="http://wa-plugins.ru/"><i class="icon16 ss pt globe"></i>WA-PLUGINS.ru - сайт разработчика</a></li>
 </ul>
 <h1>Минимальный заказ</h1>
 <div class="fields form">
@@ -73,7 +73,7 @@
                                 <input type="hidden" value="0" name="domains_settings[{$domain_hash}][redirect]" />
                                 <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][redirect]" {if $setting.redirect|default:1}checked="checked"{/if} />
                                 <p class="hint">Если опция включена, тогда осуществляется перенаправление со страниц оформления заказа на страницу корзины. 
-                                    Данная опция позволяет предотвратить прямые переходы к оформления заказа минуя корзину, в обход проверки минимального заказа. 
+                                    Данная опция позволяет предотвратить прямые переходы к оформлению заказа минуя корзину, в обход проверки минимального заказа. 
                                     Данная опция вызывает циклическую переадресацию и должна быть отключена, если у вас дополнительно установлен плагин 
                                     <a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/onestep/">"Заказ на одной странице"</a>
                                 </p>
@@ -82,6 +82,21 @@
                     </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <div class="field">
+                            <div class="name">
+                                Вывод в стандартном месте
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][default_output]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][default_output]" {if $setting.default_output|default:1}checked="checked"{/if} />
+                                или используйте хелпер вывода <b>{literal}{shopWholesalePlugin::display()}{/literal}</b>
+                                <p class="hint">Вывод в стандартном месте в корзине (хук frontend_cart)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Минимальная сумма всего заказа</h3>
                         <div class="field">
                             <div class="name">
                                 Минимальная сумма заказа
@@ -102,6 +117,7 @@
                     </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Минимальное количество всего заказа</h3>
                         <div class="field">
                             <div class="name">
                                 Минимальное количество товаров в заказе
@@ -121,6 +137,7 @@
                     </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Минимальное количество для товара и артикула</h3>
                         <div class="field">
                             <div class="name">
                                 Использовать индивидуальные настройки минимального количества для каждого товара
@@ -128,6 +145,16 @@
                             <div class="value">
                                 <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_count_setting]" />
                                 <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_count_setting]" {if $setting.product_count_setting|default:1}checked="checked"{/if} />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Использовать автоматическое добавление недостающего числа товаров
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][auto_add_product_count_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][auto_add_product_count_setting]" {if $setting.auto_add_product_count_setting|default:0}checked="checked"{/if} />
+                                <p class="hint">Если для товара установлено минимальное количество и количество данного товара в корзине покупателя меньше заданного, то плагин автоматически увеличит количество данного товара в корзине до минимального</p>
                             </div>
                         </div>
                         <div class="field">
@@ -141,6 +168,16 @@
                         </div>
                         <div class="field">
                             <div class="name">
+                                Использовать автоматическое добавление недостающего числа артикулов
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][auto_add_sku_count_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][auto_add_sku_count_setting]" {if $setting.auto_add_sku_count_setting|default:0}checked="checked"{/if} />
+                                <p class="hint">Если для артикула установлено минимальное количество и количество данного артикула в корзине покупателя меньше заданного, то плагин автоматически увеличит количество данного артикула в корзине до минимального</p>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
                                 Текст сообщения
                             </div>
                             <div class="value">
@@ -150,6 +187,7 @@
                     </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Кратность для товара и артикула</h3>
                         <div class="field">
                             <div class="name">
                                 Использовать индивидуальные настройки кратности для каждого товара
@@ -161,6 +199,16 @@
                             <p class="hint">Кратность позволяет продавать товар кратно какому-либо значению. 
                                 Например, установленная кратность для товара равная 3, позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
                                 При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Использовать автоматическое добавление недостающего числа товаров
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][auto_add_product_multiplicity_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][auto_add_product_multiplicity_setting]" {if $setting.auto_add_product_multiplicity_setting|default:0}checked="checked"{/if} />
+                                <p class="hint">Если для товара установлено кратное количество и количество данного товара в корзине покупателя не является кратным, то плагин автоматически увеличит количество данного товара в корзине до кратного</p>
+                            </div>
                         </div>
                         <div class="field">
                             <div class="name">
@@ -176,6 +224,16 @@
                         </div>
                         <div class="field">
                             <div class="name">
+                                Использовать автоматическое добавление недостающего числа артикулов
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][auto_add_sku_multiplicity_setting]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][auto_add_sku_multiplicity_setting]" {if $setting.auto_add_sku_multiplicity_setting|default:0}checked="checked"{/if} />
+                                <p class="hint">Если для артикула установлено кратное количество и количество данного артикула в корзине покупателя не является кратным, то плагин автоматически увеличит количество данного артикула в корзине до кратного</p>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
                                 Текст сообщения
                             </div>
                             <div class="value">
@@ -185,9 +243,10 @@
                     </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Минимальная сумма для категории</h3>
                         <div class="field">
                             <div class="name">
-                                Использовать индивидуальные настройки минимальной суммы заказа для категории.
+                                Использовать индивидуальные настройки минимальной суммы заказа для категории
                             </div>
                             <div class="value">
                                 <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_sum_setting]" />
@@ -205,9 +264,10 @@
                     </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Минимальное количество для категории</h3>
                         <div class="field">
                             <div class="name">
-                                Использовать индивидуальные настройки минимального количества товаров в заказе для категории.
+                                Использовать индивидуальные настройки минимального количества товаров в заказе для категории
                             </div>
                             <div class="value">
                                 <input type="hidden" value="0" name="domains_settings[{$domain_hash}][category_count_setting]" />
@@ -224,63 +284,49 @@
                         </div>
                     </div>
 
-                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
-                        <div class="field">
-                            <div class="name">
-                                Вывод в стандартном месте (хук frontend_cart)
-                            </div>
-                            <div class="value">
-                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][default_output]" />
-                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][default_output]" {if $setting.default_output|default:1}checked="checked"{/if} />
-                                или используйте хелпер вывода <b>{literal}{shopWholesalePlugin::display()}{/literal}</b>
-                            </div>
-                        </div>
-                    </div>
+
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
-                        <div class="field">
-                            <div class="name">
-                                Настройки минимального заказа для различных способов доставки
-                            </div>
-                            <div class="value">
-                                <table class="zebra" id="s-settings-shipping">
-                                    <thead>
-                                    <th></th>
-                                    <th>Способ доставки</th>
-                                    <th>Минимальная сумма заказа</th>
-                                    </thead>
-                                    <tbody>
-                                        {foreach $instances as $id => $plugin}
-                                            <tr data-id="{$id}">
-                                                <td class="min-width">
-                                                    {if !empty($plugin.logo)}
-                                                        <img src="{$plugin.logo}">
-                                                    {elseif !empty($plugin.img)}
-                                                        <img src="{$plugin.img}">
-                                                    {/if}
-                                                </td>
-                                                <td style="width:30%">
-                                                    <h3 class="large{if empty($plugin.status)} gray{/if}">
-                                                        {$plugin.name|escape}
-                                                        {if empty($plugin.status)}([`disabled`]){/if}
-                                                    </h3>
-                                                    <p class="hint">{strip_tags($plugin.description)}</p>
-                                                </td>
-                                                <td>
-                                                    <input type="text" name="domains_settings[{$domain_hash}][plugins][{$id}]" value="{$setting.plugins[$id]|escape|default:0}" /> {$currency}
-                                                </td>
-                                            </tr>
-                                        {foreachelse}
-                                            <tr>
-                                                <td>
-                                                    <em class="gray">[`No shipping options are defined.`]</em>
-                                                </td>
-                                            </tr>
-                                        {/foreach}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+
+                        <h3>Настройки минимального заказа для различных способов доставки</h3>
+
+                        <table class="zebra" id="s-settings-shipping">
+                            <thead>
+                            <th></th>
+                            <th>Способ доставки</th>
+                            <th>Минимальная сумма заказа</th>
+                            </thead>
+                            <tbody>
+                                {foreach $instances as $id => $plugin}
+                                    <tr data-id="{$id}">
+                                        <td class="min-width">
+                                            {if !empty($plugin.logo)}
+                                                <img src="{$plugin.logo}">
+                                            {elseif !empty($plugin.img)}
+                                                <img src="{$plugin.img}">
+                                            {/if}
+                                        </td>
+                                        <td style="width:30%">
+                                            <h3 class="large{if empty($plugin.status)} gray{/if}">
+                                                {$plugin.name|escape}
+                                                {if empty($plugin.status)}([`disabled`]){/if}
+                                            </h3>
+                                            <p class="hint">{strip_tags($plugin.description)}</p>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="domains_settings[{$domain_hash}][plugins][{$id}]" value="{$setting.plugins[$id]|escape|default:0}" /> {$currency}
+                                        </td>
+                                    </tr>
+                                {foreachelse}
+                                    <tr>
+                                        <td>
+                                            <em class="gray">[`No shipping options are defined.`]</em>
+                                        </td>
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                        </table>
+
                         <div class="field">
                             <div class="name">
                                 Текст сообщения
