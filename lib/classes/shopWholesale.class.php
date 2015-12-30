@@ -445,7 +445,7 @@ class shopWholesale {
      * @param type $product_name - в эту переменную записывается имя товара, для которого условие кратности количества не выполняется.
      * @param type $multiplicity_product_count - в эту переменную записывается кратность товара для артикула.
      */
-    public static function checkMultiplicitySkuCount(&$product_name = null, &$multiplicity_sku_count = null) {
+    public static function checkMultiplicitySkuCount(&$product_name = null, &$multiplicity_sku_count = null, &$item = null) {
         $wholesale_model = new shopWholesalePluginModel();
         $cart = new shopCart();
         $items = $cart->items();
@@ -462,6 +462,7 @@ class shopWholesale {
                 }
             }
         }
+        unset($item);
         return true;
     }
 

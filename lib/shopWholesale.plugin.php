@@ -169,7 +169,7 @@ class shopWholesalePlugin extends shopPlugin {
                     $this->setQuantity($item['id'], $quantity);
                 }
             }
-            if ($domain_settings['sku_multiplicity_setting'] && !shopWholesale::checkMultiplicitySkuCount($product_name, $multiplicity_sku_count) && $domain_settings['auto_add_sku_multiplicity_setting']) {
+            if ($domain_settings['sku_multiplicity_setting'] && !shopWholesale::checkMultiplicitySkuCount($product_name, $multiplicity_sku_count, $item) && $domain_settings['auto_add_sku_multiplicity_setting']) {
                 if ($item) {
                     $k = ceil($item['quantity'] / $multiplicity_sku_count);
                     $quantity = $k * $multiplicity_sku_count;
