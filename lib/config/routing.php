@@ -6,5 +6,6 @@
  */
 return array(
     'wholesale/' => 'frontend/wholesale',
-    'wholesale/shipping/' => 'frontend/shipping'
+    'wholesale/shipping/' => 'frontend/shipping',
+    'wholesale/product/' => 'frontend/product',
 );

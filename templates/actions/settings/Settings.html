@@ -89,8 +89,8 @@
                             <div class="value">
                                 <input type="hidden" value="0" name="domains_settings[{$domain_hash}][default_output]" />
                                 <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][default_output]" {if $setting.default_output|default:1}checked="checked"{/if} />
-                                или используйте хелпер вывода <b>{literal}{shopWholesalePlugin::display()}{/literal}</b>
-                                <p class="hint">Вывод в стандартном месте в корзине (хук frontend_cart)</p>
+                                или используйте хелпер вывода <strong>{ldelim}shopWholesalePlugin::display(){rdelim}</strong>
+                                <p class="hint">Вывод в стандартном месте в корзине через хук <strong>frontend_cart</strong></p>
                             </div>
                         </div>
                     </div>
@@ -285,6 +285,48 @@
                     </div>
 
 
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Настройки минимального заказа в карточке товара</h3>
+                        <div class="field">
+                            <div class="name">
+                                Плагин в карточке товара
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][frontend_product]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][frontend_product]" {if $setting.frontend_product|default:1}checked="checked"{/if} />
+                                <p class="hint">Плагин проверяет количество товара для заказа и изменяет его согласно настройкам Минимального заказа</p>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Использовать вывод плагина по умолчанию 
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][frontend_product_output]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][frontend_product_output]" {if $setting.frontend_product_output|default:1}checked="checked"{/if} />
+                                или используйте хелпер вывода <strong>{ldelim} shopWholesalePlugin::displayFrontendProduct(){rdelim}</strong>
+                                <p class="hint">Вывод плагина через хук <strong>frontend_product.cart</strong></p>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Селектор формы
+                            </div>
+                            <div class="value">
+                                <input type="text" value="{$setting.product_cart_form_selector|default:''|escape}" name="domains_settings[{$domain_hash}][product_cart_form_selector]" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Селектор кнопки "В корзину"
+                            </div>
+                            <div class="value">
+                                <input type="text" value="{$setting.product_add2cart_selector|default:''|escape}" name="domains_settings[{$domain_hash}][product_add2cart_selector]" />
+                            </div>
+                        </div>
+                    </div>
+
+
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
 
@@ -309,7 +351,7 @@
                                         <td style="width:30%">
                                             <h3 class="large{if empty($plugin.status)} gray{/if}">
                                                 {$plugin.name|escape}
-                                                {if empty($plugin.status)}([`disabled`]){/if}
+                                                {if empty($plugin.status)}(отключен){/if}
                                             </h3>
                                             <p class="hint">{strip_tags($plugin.description)}</p>
                                         </td>
@@ -379,7 +421,6 @@
                 <input type="checkbox" name="reset" value="1"  /> - Сбросить все изменения
             </div>
         </div>
-
 
         <div class="field">
             <div class="value submit">

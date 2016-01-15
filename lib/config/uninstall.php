@@ -17,6 +17,20 @@ try {
 }
 
 try {
+    $model->query("SELECT `wholesale_min_sku_count` FROM `shop_product_skus` WHERE 0");
+    $model->exec("ALTER TABLE `shop_product_skus` DROP `wholesale_min_sku_count`");
+} catch (waDbException $e) {
+    
+}
+
+try {
+    $model->query("SELECT `wholesale_sku_multiplicity` FROM `shop_product_skus` WHERE 0");
+    $model->exec("ALTER TABLE `shop_product_skus` DROP `wholesale_sku_multiplicity`");
+} catch (waDbException $e) {
+    
+}
+
+try {
     $model->query("SELECT `wholesale_min_sum` FROM `shop_category` WHERE 0");
     $model->exec("ALTER TABLE `shop_category` DROP `wholesale_min_sum`");
 } catch (waDbException $e) {

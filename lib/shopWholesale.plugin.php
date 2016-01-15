@@ -31,6 +31,10 @@ class shopWholesalePlugin extends shopPlugin {
         'default_output' => 1,
         'plugins' => array(),
         'shipping_message' => 'Вы не можете воспользоваться выбранным способом доставки т.к. сумма Вашего заказа меньше минимальной. Минимальная сумма заказа для данного способа доставки %s Попробуйте выбрать другой способ доставки или увеличить сумму заказа.',
+        'frontend_product' => 1,
+        'frontend_product_output' => 1,
+        'product_cart_form_selector' => 'form#cart-form',
+        'product_add2cart_selector' => 'input[type=submit]',
         'templates' => array(
             'cart' => array(
                 'name' => 'Шаблон для страницы корзины',
@@ -45,16 +49,24 @@ class shopWholesalePlugin extends shopPlugin {
                 'tpl_name' => 'Shipping',
                 'tpl_ext' => 'html',
                 'public' => false
-            )
+            ),
+            'product' => array(
+                'name' => 'Шаблон для страницы товара',
+                'tpl_path' => 'plugins/wholesale/templates/',
+                'tpl_name' => 'FrontendProduct',
+                'tpl_ext' => 'html',
+                'public' => false
+            ),
         )
     );
 
-    public function backendProduct($product) {
+    public function backendProductSkuSettings($params) {
         if ($this->getSettings('status')) {
+            $sku = $params['sku'];
             $view = wa()->getView();
-            $view->assign('product', $product);
-            $html = $view->fetch('plugins/wholesale/templates/BackendProduct.html');
-            return array('edit_section_li' => $html);
+            $view->assign('sku', $sku);
+            $html = $view->fetch('plugins/wholesale/templates/BackendProductSkuSettings.html');
+            return $html;
         }
     }
 
@@ -151,25 +163,25 @@ class shopWholesalePlugin extends shopPlugin {
             if (!$domain_settings['status']) {
                 return false;
             }
-            if ($domain_settings['product_count_setting'] && !shopWholesale::checkMinProductCount($product_name, $min_product_count, $item) && $domain_settings['auto_add_product_count_setting']) {
+            if ($domain_settings['product_count_setting'] && !shopWholesale::checkMinProductsCartCount($product_name, $min_product_count, $item) && $domain_settings['auto_add_product_count_setting']) {
                 if ($item) {
                     $this->setQuantity($item['id'], $min_product_count);
                 }
             }
 
-            if ($domain_settings['sku_count_setting'] && !shopWholesale::checkMinSkuCount($product_name, $min_sku_count, $item) && $domain_settings['auto_add_sku_count_setting']) {
+            if ($domain_settings['sku_count_setting'] && !shopWholesale::checkMinSkusCartCount($product_name, $min_sku_count, $item) && $domain_settings['auto_add_sku_count_setting']) {
                 if ($item) {
                     $this->setQuantity($item['id'], $min_sku_count);
                 }
             }
-            if ($domain_settings['product_multiplicity_setting'] && !shopWholesale::checkMultiplicityProductCount($product_name, $multiplicity_product_count, $item) && $domain_settings['auto_add_product_multiplicity_setting']) {
+            if ($domain_settings['product_multiplicity_setting'] && !shopWholesale::checkMultiplicityProductsCartCount($product_name, $multiplicity_product_count, $item) && $domain_settings['auto_add_product_multiplicity_setting']) {
                 if ($item) {
                     $k = ceil($item['quantity'] / $multiplicity_product_count);
                     $quantity = $k * $multiplicity_product_count;
                     $this->setQuantity($item['id'], $quantity);
                 }
             }
-            if ($domain_settings['sku_multiplicity_setting'] && !shopWholesale::checkMultiplicitySkuCount($product_name, $multiplicity_sku_count, $item) && $domain_settings['auto_add_sku_multiplicity_setting']) {
+            if ($domain_settings['sku_multiplicity_setting'] && !shopWholesale::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count, $item) && $domain_settings['auto_add_sku_multiplicity_setting']) {
                 if ($item) {
                     $k = ceil($item['quantity'] / $multiplicity_sku_count);
                     $quantity = $k * $multiplicity_sku_count;
@@ -202,6 +214,31 @@ class shopWholesalePlugin extends shopPlugin {
         $view = wa()->getView();
         $view->assign('wholesale', $data);
         return $view->fetch($templates['cart']['template_path']);
+    }
+
+    public function frontendProduct($product) {
+        $domain_settings = shopWholesale::getDomainSettings();
+        if (!empty($domain_settings['frontend_product_output'])) {
+            return array('cart' => self::displayFrontendProduct());
+        }
+    }
+
+    public static function displayFrontendProduct() {
+        $app_settings_model = new waAppSettingsModel();
+        if (!$app_settings_model->get(self::$plugin_id, 'status')) {
+            return false;
+        }
+        $domain_settings = shopWholesale::getDomainSettings();
+        $templates = $domain_settings['templates'];
+        if (!$domain_settings['status']) {
+            return false;
+        }
+        if (!$domain_settings['frontend_product']) {
+            return false;
+        }
+        $view = wa()->getView();
+        $view->assign('settings', $domain_settings);
+        return $view->fetch($templates['product']['template_path']);
     }
 
 }

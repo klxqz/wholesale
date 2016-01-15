@@ -1,0 +1,46 @@
+<script type="text/javascript">
+    $(function () {
+        var form = $('{$settings.product_cart_form_selector|escape}');
+        var submit = form.find('{$settings.product_add2cart_selector|escape}');
+        var input_quantity = form.find('input[name=quantity]');
+        var loading = $('<i class="icon16 loading"></i>');
+        submit.hide().after(loading);
+
+        var current_quantity = input_quantity.val();
+        setInterval(function () {
+            if (current_quantity != input_quantity.val()) {
+                current_quantity = input_quantity.val();
+                input_quantity.change();
+            }
+        }, 500);
+
+        function wholesale_product(message) {
+            $.ajax({
+                type: 'POST',
+                url: '{$wa_app_url}wholesale/product/',
+                data: form.serialize(),
+                dataType: 'json',
+                success: function (data, textStatus, jqXHR) {
+                    if (data.data.check.result) {
+                        loading.remove();
+                        submit.show();
+                    } else {
+                        input_quantity.val(data.data.check.quantity);
+                        loading.remove();
+                        submit.show();
+                        if (message) {
+                            alert(data.data.check.message);
+                        }
+                    }
+                }
+            });
+        }
+
+        wholesale_product(0);
+
+        input_quantity.change(function () {
+            submit.hide().after(loading);
+            wholesale_product(1);
+        });
+    });
+</script>

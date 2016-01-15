@@ -165,10 +165,10 @@ class shopWholesale {
         } elseif ($cart->count() < $domain_settings['min_order_products']) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['min_order_products_message'], $domain_settings['min_order_products']);
-        } elseif ($domain_settings['product_count_setting'] && !self::checkMinProductCount($product_name, $min_product_count)) {
+        } elseif ($domain_settings['product_count_setting'] && !self::checkMinProductsCartCount($product_name, $min_product_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_product_count);
-        } elseif ($domain_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductCount($product_name, $multiplicity_product_count)) {
+        } elseif ($domain_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductsCartCount($product_name, $multiplicity_product_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_product_count);
         } elseif ($domain_settings['category_sum_setting'] && !self::checkMinCategorySum($category_name, $min_category_sum)) {
@@ -177,10 +177,10 @@ class shopWholesale {
         } elseif ($domain_settings['category_count_setting'] && !self::checkMinCategoryCount($category_name, $min_category_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['min_order_count_category_message'], $category_name, $min_category_count);
-        } elseif ($domain_settings['sku_count_setting'] && !self::checkMinSkuCount($product_name, $min_sku_count)) {
+        } elseif ($domain_settings['sku_count_setting'] && !self::checkMinSkusCartCount($product_name, $min_sku_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_sku_count);
-        } elseif ($domain_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkuCount($product_name, $multiplicity_sku_count)) {
+        } elseif ($domain_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
         } else {
@@ -214,6 +214,51 @@ class shopWholesale {
             $return = array('result' => 0, 'message' => $message);
         } else {
             $return = array('result' => 1, 'message' => '');
+        }
+
+        return $return;
+    }
+
+    /**
+     * 
+     */
+    public static function checkProduct($product_id, $sku_id = null, $quantity = null) {
+        if (!$quantity) {
+            $quantity = 1;
+        }
+        $return = array();
+        $domain_settings = shopWholesale::getDomainSettings();
+        $product_model = new shopProductModel();
+        $product = $product_model->getById($product_id);
+        if ($sku_id) {
+            $sku_model = new shopProductSkusModel();
+            $sku = $sku_model->getById($sku_id);
+        }
+
+        if ($domain_settings['product_count_setting'] && !self::checkMinProductCount($product, $quantity, $product_name, $min_product_count)) {
+            $return['result'] = false;
+            $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_product_count);
+            $return['quantity'] = $min_product_count;
+        } elseif ($domain_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductCount($product, $quantity, $product_name, $multiplicity_product_count)) {
+            $return['result'] = false;
+            $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_product_count);
+            $k = ceil($quantity / $multiplicity_product_count);
+            $set_quantity = $k * $multiplicity_product_count;
+            $return['quantity'] = $set_quantity;
+        } elseif ($domain_settings['sku_count_setting'] && !empty($sku) && !self::checkMinSkuCount($sku, $quantity, $product_name, $min_sku_count)) {
+            $return['result'] = false;
+            $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_sku_count);
+            $return['quantity'] = $min_sku_count;
+        } elseif ($domain_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkuCount($sku, $quantity, $product_name, $multiplicity_sku_count)) {
+            $return['result'] = false;
+            $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
+            $k = ceil($quantity / $multiplicity_sku_count);
+            $set_quantity = $k * $multiplicity_sku_count;
+            $return['quantity'] = $set_quantity;
+        } else {
+            $return['result'] = true;
+            $return['message'] = '';
+            $return['quantity'] = $quantity;
         }
 
         return $return;
@@ -374,17 +419,24 @@ class shopWholesale {
      * @param type $min_product_count - в эту переменную записывается минимальное количество товара.
      * @return boolean
      */
-    public static function checkMinProductCount(&$product_name = null, &$min_product_count = null, &$item = null) {
+    public static function checkMinProductsCartCount(&$product_name = null, &$min_product_count = null, &$item = null) {
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
-            if ($item['type'] == 'product' && $item['quantity'] < $item['product']['wholesale_min_product_count']) {
-                $product_name = $item['product']['name'];
-                $min_product_count = $item['product']['wholesale_min_product_count'];
+            if ($item['type'] == 'product' && !self::checkMinProductCount($item['product'], $item['quantity'], $product_name, $min_product_count)) {
                 return false;
             }
         }
         unset($item);
+        return true;
+    }
+
+    public static function checkMinProductCount($product, $quantity, &$product_name = null, &$min_product_count = null) {
+        if ($quantity < $product['wholesale_min_product_count']) {
+            $product_name = $product['name'];
+            $min_product_count = $product['wholesale_min_product_count'];
+            return false;
+        }
         return true;
     }
 
@@ -395,17 +447,24 @@ class shopWholesale {
      * @param type $product_name - в эту переменную записывается имя товара, для которого условие кратности количества не выполняется.
      * @param type $multiplicity_product_count - в эту переменную записывается кратность товара.
      */
-    public static function checkMultiplicityProductCount(&$product_name = null, &$multiplicity_product_count = null, &$item = null) {
+    public static function checkMultiplicityProductsCartCount(&$product_name = null, &$multiplicity_product_count = null, &$item = null) {
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
-            if ($item['type'] == 'product' && $item['product']['wholesale_multiplicity'] > 0 && $item['quantity'] % $item['product']['wholesale_multiplicity'] != 0) {
-                $product_name = $item['product']['name'];
-                $multiplicity_product_count = $item['product']['wholesale_multiplicity'];
+            if ($item['type'] == 'product' && !self::checkMultiplicityProductCount($item['product'], $item['quantity'], $product_name, $multiplicity_product_count)) {
                 return false;
             }
         }
         unset($item);
+        return true;
+    }
+
+    public static function checkMultiplicityProductCount($product, $quantity, &$product_name = null, &$multiplicity_product_count = null) {
+        if ($product['wholesale_multiplicity'] > 0 && $quantity % $product['wholesale_multiplicity'] != 0) {
+            $product_name = $product['name'];
+            $multiplicity_product_count = $product['wholesale_multiplicity'];
+            return false;
+        }
         return true;
     }
 
@@ -417,24 +476,34 @@ class shopWholesale {
      * @param type $min_sku_count - в эту переменную записывается минимальное количество товара для выбранного артикула.
      * @return boolean
      */
-    public static function checkMinSkuCount(&$product_name = null, &$min_sku_count = null, &$item = null) {
-        $wholesale_model = new shopWholesalePluginModel();
+    public static function checkMinSkusCartCount(&$product_name = null, &$min_sku_count = null, &$item = null) {
+        $sku_model = new shopProductSkusModel();
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
-                $wholesale = $wholesale_model->where('product_id = ' . (int) $item['product_id'] . ' AND sku_id = ' . (int) $item['sku_id'])->fetch();
-                if (!empty($wholesale) && $item['quantity'] < $wholesale['min_sku_count']) {
-                    $product_name = $item['product']['name'];
-                    if (!empty($item['sku_name'])) {
-                        $product_name .= " (" . $item['sku_name'] . ")";
-                    }
-                    $min_sku_count = $wholesale['min_sku_count'];
+                $sku = $sku_model->getById($item['sku_id']);
+                if (!empty($sku) && !self::checkMinSkuCount($sku, $item['quantity'], $product_name, $min_sku_count)) {
                     return false;
                 }
             }
         }
         unset($item);
+        return true;
+    }
+
+    public static function checkMinSkuCount($sku, $quantity, &$product_name = null, &$min_sku_count = null) {
+        if (!empty($sku) && $quantity < $sku['wholesale_min_sku_count']) {
+            $product_model = new shopProductModel();
+            $product = $product_model->getById($sku['product_id']);
+
+            $product_name = $product['name'];
+            if (!empty($sku['name'])) {
+                $product_name .= " (" . $sku['name'] . ")";
+            }
+            $min_sku_count = $sku['wholesale_min_sku_count'];
+            return false;
+        }
         return true;
     }
 
@@ -445,24 +514,34 @@ class shopWholesale {
      * @param type $product_name - в эту переменную записывается имя товара, для которого условие кратности количества не выполняется.
      * @param type $multiplicity_product_count - в эту переменную записывается кратность товара для артикула.
      */
-    public static function checkMultiplicitySkuCount(&$product_name = null, &$multiplicity_sku_count = null, &$item = null) {
-        $wholesale_model = new shopWholesalePluginModel();
+    public static function checkMultiplicitySkusCartCount(&$product_name = null, &$multiplicity_sku_count = null, &$item = null) {
+        $sku_model = new shopProductSkusModel();
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
-                $wholesale = $wholesale_model->where('product_id = ' . (int) $item['product_id'] . ' AND sku_id = ' . (int) $item['sku_id'])->fetch();
-                if (!empty($wholesale) && $wholesale['multiplicity'] > 0 && $item['quantity'] % $wholesale['multiplicity'] != 0) {
-                    $product_name = $item['product']['name'];
-                    if (!empty($item['sku_name'])) {
-                        $product_name .= " (" . $item['sku_name'] . ")";
-                    }
-                    $multiplicity_sku_count = $wholesale['multiplicity'];
+                $sku = $sku_model->getById($item['sku_id']);
+                if (!empty($sku) && !self::checkMultiplicitySkuCount($sku, $item['quantity'], $product_name, $multiplicity_sku_count)) {
                     return false;
                 }
             }
         }
         unset($item);
+        return true;
+    }
+
+    public static function checkMultiplicitySkuCount($sku, $quantity, &$product_name = null, &$multiplicity_sku_count = null) {
+        if ($sku['wholesale_sku_multiplicity'] > 0 && $quantity % $sku['wholesale_sku_multiplicity'] != 0) {
+            $product_model = new shopProductModel();
+            $product = $product_model->getById($sku['product_id']);
+
+            $product_name = $product['name'];
+            if (!empty($sku['name'])) {
+                $product_name .= " (" . $sku['name'] . ")";
+            }
+            $multiplicity_sku_count = $sku['wholesale_sku_multiplicity'];
+            return false;
+        }
         return true;
     }
 
