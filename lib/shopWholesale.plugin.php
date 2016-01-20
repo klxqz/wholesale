@@ -34,7 +34,7 @@ class shopWholesalePlugin extends shopPlugin {
         'frontend_product' => 1,
         'frontend_product_output' => 1,
         'product_cart_form_selector' => 'form#cart-form',
-        'product_add2cart_selector' => 'input[type=submit]',
+        'product_add2cart_selector' => '#button-cart',
         'templates' => array(
             'cart' => array(
                 'name' => 'Шаблон для страницы корзины',

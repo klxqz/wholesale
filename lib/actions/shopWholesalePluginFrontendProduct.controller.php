@@ -9,6 +9,7 @@ class shopWholesalePluginFrontendProductController extends waJsonController {
     public function execute() {
         try {
             $quantity = waRequest::post('quantity', 1);
+            $old_quantity = waRequest::post('old_quantity');
             $product_id = waRequest::post('product_id', 0, waRequest::TYPE_INT);
             if (!$product_id) {
                 throw new waException('Минимальный заказ: product_id не определен');
@@ -20,7 +21,7 @@ class shopWholesalePluginFrontendProductController extends waJsonController {
                 $sku_id = $product_features_model->getSkuByFeatures($product_id, $features);
             }
 
-            $check = shopWholesale::checkProduct($product_id, $sku_id, $quantity);
+            $check = shopWholesale::checkProduct($product_id, $sku_id, $quantity, $old_quantity);
             $this->response['check'] = $check;
         } catch (Exception $e) {
             $this->setError($e->getMessage());

@@ -222,7 +222,7 @@ class shopWholesale {
     /**
      * 
      */
-    public static function checkProduct($product_id, $sku_id = null, $quantity = null) {
+    public static function checkProduct($product_id, $sku_id = null, $quantity = null, $old_quantity = null) {
         if (!$quantity) {
             $quantity = 1;
         }
@@ -242,8 +242,16 @@ class shopWholesale {
         } elseif ($domain_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductCount($product, $quantity, $product_name, $multiplicity_product_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_product_count);
-            $k = ceil($quantity / $multiplicity_product_count);
-            $set_quantity = $k * $multiplicity_product_count;
+            if ($old_quantity < $quantity) {
+                $k = ceil($quantity / $multiplicity_product_count);
+                $set_quantity = $k * $multiplicity_product_count;
+            } else {
+                $k = floor($quantity / $multiplicity_product_count);
+                $set_quantity = $k * $multiplicity_product_count;
+            }
+            if ($set_quantity == 0) {
+                $set_quantity = $multiplicity_product_count;
+            }
             $return['quantity'] = $set_quantity;
         } elseif ($domain_settings['sku_count_setting'] && !empty($sku) && !self::checkMinSkuCount($sku, $quantity, $product_name, $min_sku_count)) {
             $return['result'] = false;
@@ -252,8 +260,16 @@ class shopWholesale {
         } elseif ($domain_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkuCount($sku, $quantity, $product_name, $multiplicity_sku_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
-            $k = ceil($quantity / $multiplicity_sku_count);
-            $set_quantity = $k * $multiplicity_sku_count;
+            if ($old_quantity < $quantity) {
+                $k = ceil($quantity / $multiplicity_sku_count);
+                $set_quantity = $k * $multiplicity_sku_count;
+            } else {
+                $k = floor($quantity / $multiplicity_sku_count);
+                $set_quantity = $k * $multiplicity_sku_count;
+            }
+            if ($set_quantity == 0) {
+                $set_quantity = $multiplicity_sku_count;
+            }
             $return['quantity'] = $set_quantity;
         } else {
             $return['result'] = true;
