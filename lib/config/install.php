@@ -23,7 +23,7 @@ try {
 }
 
 try {
-    $sql = 'SELECT `wholesale_min_sku_count` FROM `shop_product` WHERE 0';
+    $sql = 'SELECT `wholesale_min_sku_count` FROM `shop_product_skus` WHERE 0';
     $model->query($sql);
 } catch (waDbException $ex) {
     $sql = "ALTER TABLE `shop_product_skus` ADD `wholesale_min_sku_count` INT NOT NULL DEFAULT '0' AFTER `id`";
@@ -31,7 +31,7 @@ try {
 }
 
 try {
-    $sql = 'SELECT `wholesale_sku_multiplicity` FROM `shop_product` WHERE 0';
+    $sql = 'SELECT `wholesale_sku_multiplicity` FROM `shop_product_skus` WHERE 0';
     $model->query($sql);
 } catch (waDbException $ex) {
     $sql = "ALTER TABLE `shop_product_skus` ADD `wholesale_sku_multiplicity` INT NOT NULL DEFAULT '0' AFTER `id`";
