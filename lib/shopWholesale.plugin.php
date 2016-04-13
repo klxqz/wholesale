@@ -28,13 +28,14 @@ class shopWholesalePlugin extends shopPlugin {
         'min_order_sum_category_message' => 'Вы не можете оформить заказ т.к. сумма Вашего заказа для категории "%s" меньше минимальной. Минимальная сумма заказа %s',
         'category_count_setting' => 1,
         'min_order_count_category_message' => 'Вы не можете оформить заказ т.к. количество товаров для категории "%s" в Вашей корзине меньше минимального. Минимальное количество товаров %s шт.',
-        'default_output' => 1,
+        'frontend_cart_output' => 1,
         'plugins' => array(),
         'shipping_message' => 'Вы не можете воспользоваться выбранным способом доставки т.к. сумма Вашего заказа меньше минимальной. Минимальная сумма заказа для данного способа доставки %s Попробуйте выбрать другой способ доставки или увеличить сумму заказа.',
         'frontend_product' => 1,
         'frontend_product_output' => 1,
         'product_cart_form_selector' => 'form#cart-form',
-        'product_add2cart_selector' => '#button-cart',
+        'product_add2cart_selector' => 'form#cart-form [type=submit]',
+        'product_message' => 1,
         'templates' => array(
             'cart' => array(
                 'name' => 'Шаблон для страницы корзины',
@@ -190,13 +191,17 @@ class shopWholesalePlugin extends shopPlugin {
             }
 
 
-            if ($domain_settings['default_output']) {
-                return self::display();
+            if ($domain_settings['frontend_cart_output']) {
+                return self::displayFrontendCart();
             }
         }
     }
 
     public static function display() {
+        return self::displayFrontendCart();
+    }
+
+    public static function displayFrontendCart() {
         $app_settings_model = new waAppSettingsModel();
         if (!$app_settings_model->get(self::$plugin_id, 'status')) {
             return false;
@@ -208,11 +213,8 @@ class shopWholesalePlugin extends shopPlugin {
         if (!$domain_settings['status']) {
             return false;
         }
-
-        $data = shopWholesale::checkOrder();
-
+        
         $view = wa()->getView();
-        $view->assign('wholesale', $data);
         return $view->fetch($templates['cart']['template_path']);
     }
 

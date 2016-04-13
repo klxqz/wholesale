@@ -1,11 +1,10 @@
 <script type="text/javascript">
     $(function () {
         var form = $('{$settings.product_cart_form_selector|escape}');
-        var submit = form.find('{$settings.product_add2cart_selector|escape}');
+        var submit = $('{$settings.product_add2cart_selector|escape}');
         var input_quantity = form.find('input[name=quantity]');
         var old_quantity_val = input_quantity.val();
-        var loading = $('<i class="icon16 loading"></i>');
-        submit.hide().after(loading);
+        var loading = $('<i class="wholesale-loading icon16 loading"></i>');
 
         var current_quantity = input_quantity.val();
         setInterval(function () {
@@ -28,11 +27,11 @@
                     success: function (data, textStatus, jqXHR) {
                         busy = false;
                         if (data.data.check.result) {
-                            loading.remove();
+                            $('.wholesale-loading').remove();
                             submit.show();
                         } else {
                             input_quantity.val(data.data.check.quantity);
-                            loading.remove();
+                            $('.wholesale-loading').remove();
                             submit.show();
                             if (message) {
                                 alert(data.data.check.message);
@@ -47,7 +46,7 @@
         wholesale_product(0);
 
         input_quantity.change(function () {
-            wholesale_product(1);
+            wholesale_product({$settings.product_message});
         });
     });
 </script>

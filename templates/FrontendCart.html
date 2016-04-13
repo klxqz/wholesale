@@ -1,76 +1,40 @@
 <style>
-    .cart_wholesale{
+    #wholesale-cart{
         color: #FF0000;
         font-weight: bold;
     }
 </style>
 <script type="text/javascript">
-    (function ($) {
-        $.wholesale_plugin = {
-            options: {},
-            init: function (options) {
-                this.options = options;
-                if (!this.options.wholesale_check) {
-                    this.locking();
-                }
-                this.submitForm();
-                this.checkInterval();
-            },
-            locking: function () {
-                $('input[name="checkout"]').hide();
-                $('.checkout-form input[type="submit"]').hide();
-                $('.cart_wholesale').text(this.options.wholesale_message);
-            },
-            unlocking: function () {
-                $('input[name="checkout"]').show();
-                $('.checkout-form input[type="submit"]').show();
-                $('.cart_wholesale').text('');
-            },
-            submitForm: function () {
-                var self = this;
-                $('input[name="checkout"], .checkout-form input[type="submit"]').closest('form').submit(function () {
-                    if (!self.options.wholesale_check) {
-                        return false;
-                    }
-                });
-            },
-            checkInterval: function () {
-                var self = this;
-                setInterval(function () {
-                    if (self.options.cart_total != $('.cart-total').text()) {
-                        $('.cart_wholesale').html('<i class="icon16 loading"></i>');
-                        $('input[name="checkout"]').attr('disabled', true);
-                        $.ajax({
-                            type: 'POST',
-                            url: self.options.checkUrl,
-                            dataType: 'json',
-                            success: function (data, textStatus, jqXHR) {
-                                $('input[name="checkout"]').removeAttr('disabled');
-                                self.options.wholesale_check = data.data.check.result;
-                                self.options.wholesale_message = data.data.check.message;
-                                if (data.data.check.result) {
-                                    self.unlocking();
-                                } else {
-                                    self.locking();
-                                }
-                            }
-                        });
-                        self.options.cart_total = $('.cart-total').text();
-                    }
-                }, 500);
-            }
-        };
-    })(jQuery);
-
     $(function () {
-        $.wholesale_plugin.init({
-            'checkUrl': '{$wa_app_url}wholesale/',
-            'wholesale_check': {if $wholesale.result}1{else}0{/if},
-            'wholesale_message': '{$wholesale.message}',
-            'cart_total': $('.cart-total').text()
+        var wholesale = $('#wholesale-cart');
+        var checkout_button = $('input[name=checkout]');
+        wholesale.on('updateCart', function () {
+            checkout_button.attr('disabled', true);
+            wholesale.text('');
+            var loading = $('<i class="icon16 loading"></i>').insertBefore(checkout_button);
+            $.ajax({
+                type: 'POST',
+                url: '{$wa_app_url}wholesale/cart/',
+                dataType: 'json',
+                success: function (data, textStatus, jqXHR) {
+                    loading.remove();
+                    if (data.data.check.result) {
+                        checkout_button.removeAttr('disabled');
+                    } else {
+                        wholesale.text(data.data.check.message);
+                    }
+                }
+            });
         });
+        wholesale.trigger('updateCart');
+        var total = $('.cart-total').html();
+        setInterval(function () {
+            if (total != $('.cart-total').html()) {
+                total = $('.cart-total').html();
+                wholesale.trigger('updateCart');
+            }
+        }, 500);
     });
-
 </script>
 
-<div class="cart_wholesale"></div>
+<div id="wholesale-cart"></div>

@@ -82,20 +82,6 @@
                     </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
-                        <div class="field">
-                            <div class="name">
-                                Вывод в стандартном месте
-                            </div>
-                            <div class="value">
-                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][default_output]" />
-                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][default_output]" {if $setting.default_output|default:1}checked="checked"{/if} />
-                                или используйте хелпер вывода <strong>{ldelim}shopWholesalePlugin::display(){rdelim}</strong>
-                                <p class="hint">Вывод в стандартном месте в корзине через хук <strong>frontend_cart</strong></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
                         <h3>Минимальная сумма всего заказа</h3>
                         <div class="field">
                             <div class="name">
@@ -284,6 +270,32 @@
                         </div>
                     </div>
 
+                    <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
+                        <h3>Настройки минимального заказа в корзине</h3>
+                        {*
+                        <div class="field">
+                            <div class="name">
+                                Обновление корзины
+                            </div>
+                            <div class="value">
+                                Плагин отслеживает события обновления корзины. <strong>$('#wholesale-cart').trigger('updateCart');</strong>
+                                <p class="hint">
+                                    Добавьте код <strong>$('#wholesale-cart').trigger('updateCart');</strong> в шаблон <strong>cart.js</strong> в функцию <strong>updateCart</strong>
+                                </p>
+                            </div>
+                        </div>*}
+                        <div class="field">
+                            <div class="name">
+                                Использовать вывод плагина по умолчанию 
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][frontend_cart_output]" />
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][frontend_cart_output]" {if $setting.frontend_cart_output|default:1}checked="checked"{/if} />
+                                или используйте хелпер вывода <strong>{ldelim} shopWholesalePlugin::displayFrontendCart(){rdelim}</strong>
+                                <p class="hint">Вывод плагина через хук <strong>frontend_cart</strong></p>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="field-group"{if empty($setting.status)} style="display:none;"{/if}>
                         <h3>Настройки минимального заказа в карточке товара</h3>
@@ -322,6 +334,15 @@
                             </div>
                             <div class="value">
                                 <input type="text" value="{$setting.product_add2cart_selector|default:''|escape}" name="domains_settings[{$domain_hash}][product_add2cart_selector]" />
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="name">
+                                Сообщение
+                            </div>
+                            <div class="value">
+                                <input type="hidden" value="0" name="domains_settings[{$domain_hash}][product_message]"/>
+                                <input type="checkbox" value="1" name="domains_settings[{$domain_hash}][product_message]"{if $setting.product_message|default:'1'} checked="checked"{/if}/>
                             </div>
                         </div>
                     </div>

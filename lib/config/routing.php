@@ -5,7 +5,7 @@
  * @link http://wa-plugins.ru/
  */
 return array(
-    'wholesale/' => 'frontend/wholesale',
+    'wholesale/cart/' => 'frontend/cart',
     'wholesale/shipping/' => 'frontend/shipping',
     'wholesale/product/' => 'frontend/product',
 );

@@ -306,16 +306,16 @@ class shopWholesale {
 
     /**
      * Возвращает количество товара добавленного в корзину для заданной категории и ее подкатегорий
-     * @param array $category
+     * @param array $category_id
      * @return int
      */
-    protected static function getCategoryProductsCount($category) {
+    protected static function getCategoryProductsCount($category_id) {
         $category_model = new shopCategoryModel();
+        $category = $category_model->getById($category_id);
         $count = 0;
         $cart = new shopCart();
         $items = $cart->items();
         foreach ($items as $item) {
-            $category = $category_model->getById($item['product']['category_id']);
             if ($item['type'] == 'product' && self::inCategory($category, $item['product'])) {
                 $count += $item['quantity'];
             }
