@@ -293,11 +293,14 @@ class shopWholesale {
         $items = $cart->items();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
-                $category_min_count = self::getCategoryMinCount($item['product']['category_id'], $category_name);
-                $category_count = self::getCategoryProductsCount($item['product']['category_id']);
-                if ($category_count < $category_min_count) {
-                    $min_category_count = $category_min_count;
-                    return false;
+                $product = new shopProduct($item['product']['id']);
+                foreach ($product->categories as $category) {
+                    $category_min_count = self::getCategoryMinCount($category['id'], $category_name);
+                    $category_count = self::getCategoryProductsCount($category['id']);
+                    if ($category_count < $category_min_count) {
+                        $min_category_count = $category_min_count;
+                        return false;
+                    }
                 }
             }
         }

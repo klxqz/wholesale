@@ -66,6 +66,7 @@ class shopWholesalePlugin extends shopPlugin {
             $sku = $params['sku'];
             $view = wa()->getView();
             $view->assign('sku', $sku);
+            $view->assign('sku_id', $params['sku_id']);
             $html = $view->fetch('plugins/wholesale/templates/BackendProductSkuSettings.html');
             return $html;
         }
