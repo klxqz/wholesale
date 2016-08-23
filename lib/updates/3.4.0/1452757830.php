@@ -47,6 +47,8 @@ try {
         'plugins/wholesale/templates/BackendProduct.html',
         'plugins/wholesale/js/loadcontent.js',
         'plugins/wholesale/js/wholesale.js',
+        'plugins/wholesale/js/',
+        'plugins/wholesale/lib/models/',
     );
 
     foreach ($files as $file) {
