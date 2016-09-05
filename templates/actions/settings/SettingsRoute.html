@@ -299,7 +299,15 @@
 <div class="field-group">
 
     <h3>Настройки минимального заказа для различных способов доставки</h3>
-
+    <div class="field">
+        <div class="name">
+            Селектор кнопки "Далее" на шаге доставки
+        </div>
+        <div class="value">
+            <input type="text" value="{$route_settings.shipping_submit_selector|default:'.step-shipping input[type=submit]'|escape}" name="route_settings[shipping_submit_selector]" />
+            <p>Плагин блокирует кнопку "Далее" используя указанный селектор</p>
+        </div>
+    </div>
     <table class="zebra" id="s-settings-shipping">
         <thead>
         <th></th>

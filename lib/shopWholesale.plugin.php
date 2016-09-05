@@ -161,6 +161,7 @@ class shopWholesalePlugin extends shopPlugin {
         if ($param['step'] == 'shipping') {
             $view = wa()->getView();
             $shipping_template = shopWholesaleHelper::getRouteTemplates($route_hash, 'shipping');
+            $view->assign('settings', $route_settings);
             return $view->fetch('string:' . $shipping_template['template']);
         }
     }
@@ -259,7 +260,7 @@ class shopWholesalePlugin extends shopPlugin {
         } else {
             return false;
         }
-        
+
         if (!empty($route_settings['frontend_product_output'])) {
             return array('cart' => self::displayFrontendProduct());
         }
