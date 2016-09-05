@@ -1,143 +1,148 @@
 <?php
 
 class shopWholesale {
+    /*
+      public static function getRouteHash() {
+      $domain = wa()->getRouting()->getDomain(null, true);
+      $route = wa()->getRouting()->getRoute();
+      return md5($domain . '/' . $route['url']);
+      }
+     */
+    /*
+      public static function getDomainsSettings() {
 
-    public static function getRouteHash() {
-        $domain = wa()->getRouting()->getDomain(null, true);
-        $route = wa()->getRouting()->getRoute();
-        return md5($domain . '/' . $route['url']);
-    }
+      $cache = new waSerializeCache('shopWholesalePlugin');
 
-    public static function getDomainsSettings() {
+      if ($cache && $cache->isCached()) {
+      $domains_settings = $cache->get();
+      } else {
+      $app_settings_model = new waAppSettingsModel();
+      $routing = wa()->getRouting();
+      $domains_routes = $routing->getByApp('shop');
+      $app_settings_model->get(shopWholesalePlugin::$plugin_id, 'domains_settings');
+      $domains_settings = json_decode($app_settings_model->get(shopWholesalePlugin::$plugin_id, 'domains_settings'), true);
 
-        $cache = new waSerializeCache('shopWholesalePlugin');
+      if (empty($domains_settings)) {
+      $domains_settings = array();
+      }
 
-        if ($cache && $cache->isCached()) {
-            $domains_settings = $cache->get();
-        } else {
-            $app_settings_model = new waAppSettingsModel();
-            $routing = wa()->getRouting();
-            $domains_routes = $routing->getByApp('shop');
-            $app_settings_model->get(shopWholesalePlugin::$plugin_id, 'domains_settings');
-            $domains_settings = json_decode($app_settings_model->get(shopWholesalePlugin::$plugin_id, 'domains_settings'), true);
+      foreach ($domains_routes as $domain => $routes) {
+      foreach ($routes as $route) {
+      $domain_route = md5($domain . '/' . $route['url']);
+      if (empty($domains_settings[$domain_route])) {
+      $domains_settings[$domain_route] = shopWholesalePlugin::$default_settings;
+      }
+      foreach (shopWholesalePlugin::$default_settings as $key => $value) {
+      if (!isset($domains_settings[$domain_route][$key])) {
+      $domains_settings[$domain_route][$key] = $value;
+      }
+      }
 
-            if (empty($domains_settings)) {
-                $domains_settings = array();
-            }
+      foreach (shopWholesalePlugin::$default_settings['templates'] as $tpl_name => $tpl) {
+      $domains_settings[$domain_route]['templates'][$tpl_name] = $tpl;
 
-            foreach ($domains_routes as $domain => $routes) {
-                foreach ($routes as $route) {
-                    $domain_route = md5($domain . '/' . $route['url']);
-                    if (empty($domains_settings[$domain_route])) {
-                        $domains_settings[$domain_route] = shopWholesalePlugin::$default_settings;
-                    }
-                    foreach (shopWholesalePlugin::$default_settings as $key => $value) {
-                        if (!isset($domains_settings[$domain_route][$key])) {
-                            $domains_settings[$domain_route][$key] = $value;
-                        }
-                    }
-
-                    foreach (shopWholesalePlugin::$default_settings['templates'] as $tpl_name => $tpl) {
-                        $domains_settings[$domain_route]['templates'][$tpl_name] = $tpl;
-
-                        $tpl_full_path = $tpl['tpl_path'] . $domain_route . '_' . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
-                        $domains_settings[$domain_route]['templates'][$tpl_name]['tpl_full_path'] = $tpl_full_path;
-                        $template_path = wa()->getDataPath($tpl_full_path, $tpl['public'], 'shop', true);
-
-
-                        if (file_exists($template_path)) {
-                            $domains_settings[$domain_route]['templates'][$tpl_name]['template_path'] = $template_path;
-                            $domains_settings[$domain_route]['templates'][$tpl_name]['template'] = file_get_contents($template_path);
-                            $domains_settings[$domain_route]['templates'][$tpl_name]['change_tpl'] = 1;
-                        } else {
-                            $domains_settings[$domain_route]['templates'][$tpl_name]['tpl_full_path'] = $tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
-                            $template_path = wa()->getAppPath($tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'], 'shop');
-                            $domains_settings[$domain_route]['templates'][$tpl_name]['template_path'] = $template_path;
-                            $domains_settings[$domain_route]['templates'][$tpl_name]['template'] = file_get_contents($template_path);
-                            $domains_settings[$domain_route]['templates'][$tpl_name]['change_tpl'] = 0;
-                        }
-                    }
-                }
-
-                if ($domains_settings && $cache) {
-                    $cache->set($domains_settings);
-                }
-            }
-        }
-
-        return $domains_settings;
-    }
-
-    public static function saveDomainsSettings($domains_settings) {
+      $tpl_full_path = $tpl['tpl_path'] . $domain_route . '_' . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
+      $domains_settings[$domain_route]['templates'][$tpl_name]['tpl_full_path'] = $tpl_full_path;
+      $template_path = wa()->getDataPath($tpl_full_path, $tpl['public'], 'shop', true);
 
 
-        $app_settings_model = new waAppSettingsModel();
-        $routing = wa()->getRouting();
-        $domains_routes = $routing->getByApp('shop');
+      if (file_exists($template_path)) {
+      $domains_settings[$domain_route]['templates'][$tpl_name]['template_path'] = $template_path;
+      $domains_settings[$domain_route]['templates'][$tpl_name]['template'] = file_get_contents($template_path);
+      $domains_settings[$domain_route]['templates'][$tpl_name]['change_tpl'] = 1;
+      } else {
+      $domains_settings[$domain_route]['templates'][$tpl_name]['tpl_full_path'] = $tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
+      $template_path = wa()->getAppPath($tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'], 'shop');
+      $domains_settings[$domain_route]['templates'][$tpl_name]['template_path'] = $template_path;
+      $domains_settings[$domain_route]['templates'][$tpl_name]['template'] = file_get_contents($template_path);
+      $domains_settings[$domain_route]['templates'][$tpl_name]['change_tpl'] = 0;
+      }
+      }
+      }
 
-        foreach ($domains_routes as $domain => $routes) {
-            foreach ($routes as $route) {
-                $domain_route = md5($domain . '/' . $route['url']);
+      if ($domains_settings && $cache) {
+      $cache->set($domains_settings);
+      }
+      }
+      }
 
-                foreach (shopWholesalePlugin::$default_settings['templates'] as $id => $template) {
-                    $tpl_full_path = $template['tpl_path'] . $domain_route . '_' . $template['tpl_name'] . '.' . $template['tpl_ext'];
-                    $template_path = wa()->getDataPath($tpl_full_path, $template['public'], 'shop', true);
-
-                    @unlink($template_path);
-                    if (empty($domains_settings[$domain_route]['templates'][$id]['reset_tpl'])) {
-                        $source_path = wa()->getAppPath($template['tpl_path'] . $template['tpl_name'] . '.' . $template['tpl_ext'], 'shop');
-                        $source_content = file_get_contents($source_path);
+      return $domains_settings;
+      }
+     * 
+     */
+    /*
+      public static function saveDomainsSettings($domains_settings) {
 
 
-                        if (!isset($domains_settings[$domain_route]['templates'][$id]['template'])) {
-                            continue;
-                        }
+      $app_settings_model = new waAppSettingsModel();
+      $routing = wa()->getRouting();
+      $domains_routes = $routing->getByApp('shop');
 
-                        $post_template = $domains_settings[$domain_route]['templates'][$id]['template'];
+      foreach ($domains_routes as $domain => $routes) {
+      foreach ($routes as $route) {
+      $domain_route = md5($domain . '/' . $route['url']);
 
-                        if ($source_content != $post_template) {
-                            $f = fopen($template_path, 'w');
-                            if (!$f) {
-                                throw new waException('Не удаётся сохранить шаблон. Проверьте права на запись ' . $template_path);
-                            }
-                            fwrite($f, $post_template);
-                            fclose($f);
-                        }
-                    }
-                }
-                unset($domains_settings[$domain_route]['templates']);
-            }
-        }
+      foreach (shopWholesalePlugin::$default_settings['templates'] as $id => $template) {
+      $tpl_full_path = $template['tpl_path'] . $domain_route . '_' . $template['tpl_name'] . '.' . $template['tpl_ext'];
+      $template_path = wa()->getDataPath($tpl_full_path, $template['public'], 'shop', true);
 
-        $app_settings_model->set(shopWholesalePlugin::$plugin_id, 'domains_settings', json_encode($domains_settings));
-        $cache = new waSerializeCache('shopWholesalePlugin');
-        if ($cache && $cache->isCached()) {
-            $cache->delete();
-        }
-    }
+      @unlink($template_path);
+      if (empty($domains_settings[$domain_route]['templates'][$id]['reset_tpl'])) {
+      $source_path = wa()->getAppPath($template['tpl_path'] . $template['tpl_name'] . '.' . $template['tpl_ext'], 'shop');
+      $source_content = file_get_contents($source_path);
 
-    public static function getDomainSettings() {
-        $domains_settings = self::getDomainsSettings();
-        $hash = self::getRouteHash();
 
-        $domain_settings = array();
-        if (!empty($domains_settings[$hash])) {
-            $domain_settings = $domains_settings[$hash];
-        } else {
-            $domain_settings = shopWholesalePlugin::$default_settings;
-            foreach ($domain_settings['templates'] as $tpl_name => $tpl) {
-                $domain_settings['templates'][$tpl_name] = $tpl;
+      if (!isset($domains_settings[$domain_route]['templates'][$id]['template'])) {
+      continue;
+      }
 
-                $domain_settings['templates'][$tpl_name]['tpl_full_path'] = $tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
-                $template_path = wa()->getAppPath($tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'], 'shop');
-                $domain_settings['templates'][$tpl_name]['template_path'] = $template_path;
-                $domain_settings['templates'][$tpl_name]['template'] = file_get_contents($template_path);
-                $domain_settings['templates'][$tpl_name]['change_tpl'] = 0;
-            }
-        }
+      $post_template = $domains_settings[$domain_route]['templates'][$id]['template'];
 
-        return $domain_settings;
-    }
+      if ($source_content != $post_template) {
+      $f = fopen($template_path, 'w');
+      if (!$f) {
+      throw new waException('Не удаётся сохранить шаблон. Проверьте права на запись ' . $template_path);
+      }
+      fwrite($f, $post_template);
+      fclose($f);
+      }
+      }
+      }
+      unset($domains_settings[$domain_route]['templates']);
+      }
+      }
+
+      $app_settings_model->set(shopWholesalePlugin::$plugin_id, 'domains_settings', json_encode($domains_settings));
+      $cache = new waSerializeCache('shopWholesalePlugin');
+      if ($cache && $cache->isCached()) {
+      $cache->delete();
+      }
+      }
+     */
+    /*
+      public static function getDomainSettings() {
+      $domains_settings = self::getDomainsSettings();
+      $hash = self::getRouteHash();
+
+      $domain_settings = array();
+      if (!empty($domains_settings[$hash])) {
+      $domain_settings = $domains_settings[$hash];
+      } else {
+      $domain_settings = shopWholesalePlugin::$default_settings;
+      foreach ($domain_settings['templates'] as $tpl_name => $tpl) {
+      $domain_settings['templates'][$tpl_name] = $tpl;
+
+      $domain_settings['templates'][$tpl_name]['tpl_full_path'] = $tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
+      $template_path = wa()->getAppPath($tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'], 'shop');
+      $domain_settings['templates'][$tpl_name]['template_path'] = $template_path;
+      $domain_settings['templates'][$tpl_name]['template'] = file_get_contents($template_path);
+      $domain_settings['templates'][$tpl_name]['change_tpl'] = 0;
+      }
+      }
+
+      return $domain_settings;
+      }
+     */
 
     /**
      * Проверка текущего заказ на соответсвие минимальным требованиям.
@@ -147,45 +152,55 @@ class shopWholesale {
      * @return array('result' => boolean, 'message' => string)
      */
     public static function checkOrder() {
-        $return = array();
-        $domain_settings = shopWholesale::getDomainSettings();
+        $return = array(
+            'result' => true,
+            'message' => '',
+        );
+
+        $route_hash = null;
+        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+            $route_hash = null;
+            $route_settings = shopWholesaleHelper::getRouteSettings();
+        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_hash = 0;
+            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+        } else {
+            return $return;
+        }
 
         $cart = new shopCart();
         $def_currency = wa('shop')->getConfig()->getCurrency(true);
         $cur_currency = wa('shop')->getConfig()->getCurrency(false);
 
-        $total = $cart->total(false);
+        $total = $cart->total(true);
         $total = shop_currency($total, $cur_currency, $def_currency, false);
-        $min_order_sum = $domain_settings['min_order_sum'];
+        $min_order_sum = $route_settings['min_order_sum'];
         $min_order_sum_format = shop_currency($min_order_sum);
 
         if ($total < $min_order_sum) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_order_sum_message'], $min_order_sum_format);
-        } elseif ($cart->count() < $domain_settings['min_order_products']) {
+            $return['message'] = sprintf($route_settings['min_order_sum_message'], $min_order_sum_format);
+        } elseif ($cart->count() < $route_settings['min_order_products']) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_order_products_message'], $domain_settings['min_order_products']);
-        } elseif ($domain_settings['product_count_setting'] && !self::checkMinProductsCartCount($product_name, $min_product_count)) {
+            $return['message'] = sprintf($route_settings['min_order_products_message'], $route_settings['min_order_products']);
+        } elseif ($route_settings['product_count_setting'] && !self::checkMinProductsCartCount($product_name, $min_product_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_product_count);
-        } elseif ($domain_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductsCartCount($product_name, $multiplicity_product_count)) {
+            $return['message'] = sprintf($route_settings['min_product_count_message'], $product_name, $min_product_count);
+        } elseif ($route_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductsCartCount($product_name, $multiplicity_product_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_product_count);
-        } elseif ($domain_settings['category_sum_setting'] && !self::checkMinCategorySum($category_name, $min_category_sum)) {
+            $return['message'] = sprintf($route_settings['multiplicity_product_message'], $product_name, $multiplicity_product_count);
+        } elseif ($route_settings['category_sum_setting'] && !self::checkMinCategorySum($category_name, $min_category_sum)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_order_sum_category_message'], $category_name, shop_currency($min_category_sum));
-        } elseif ($domain_settings['category_count_setting'] && !self::checkMinCategoryCount($category_name, $min_category_count)) {
+            $return['message'] = sprintf($route_settings['min_order_sum_category_message'], $category_name, shop_currency($min_category_sum));
+        } elseif ($route_settings['category_count_setting'] && !self::checkMinCategoryCount($category_name, $min_category_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_order_count_category_message'], $category_name, $min_category_count);
-        } elseif ($domain_settings['sku_count_setting'] && !self::checkMinSkusCartCount($product_name, $min_sku_count)) {
+            $return['message'] = sprintf($route_settings['min_order_count_category_message'], $category_name, $min_category_count);
+        } elseif ($route_settings['sku_count_setting'] && !self::checkMinSkusCartCount($product_name, $min_sku_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_sku_count);
-        } elseif ($domain_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count)) {
+            $return['message'] = sprintf($route_settings['min_product_count_message'], $product_name, $min_sku_count);
+        } elseif ($route_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
-        } else {
-            $return['result'] = true;
-            $return['message'] = '';
+            $return['message'] = sprintf($route_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
         }
         return $return;
     }
@@ -199,21 +214,33 @@ class shopWholesale {
      * @return array('result' => boolean, 'message' => string)
      */
     public static function checkShipping($shipping_id) {
-        $return = array();
-        $domain_settings = shopWholesale::getDomainSettings();
-        $plugins = $domain_settings['plugins'];
+        $return = array(
+            'result' => true,
+            'message' => '',
+        );
+
+        $route_hash = null;
+        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+            $route_hash = null;
+            $route_settings = shopWholesaleHelper::getRouteSettings();
+        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_hash = 0;
+            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+        } else {
+            return $return;
+        }
+
+        $plugins = $route_settings['plugins'];
 
         $cart = new shopCart();
         $def_currency = wa('shop')->getConfig()->getCurrency(true);
         $cur_currency = wa('shop')->getConfig()->getCurrency(false);
-        $total = $cart->total(false);
+        $total = $cart->total(true);
         $total = shop_currency($total, $cur_currency, $def_currency, false);
 
         if (!empty($plugins[$shipping_id]) && $total < $plugins[$shipping_id]) {
-            $message = sprintf($domain_settings['shipping_message'], shop_currency($plugins[$shipping_id]));
+            $message = sprintf($route_settings['shipping_message'], shop_currency($plugins[$shipping_id]));
             $return = array('result' => 0, 'message' => $message);
-        } else {
-            $return = array('result' => 1, 'message' => '');
         }
 
         return $return;
@@ -226,8 +253,22 @@ class shopWholesale {
         if (!$quantity) {
             $quantity = 1;
         }
-        $return = array();
-        $domain_settings = shopWholesale::getDomainSettings();
+        $return = array(
+            'result' => true,
+            'message' => '',
+            'quantity' => $quantity,
+        );
+        $route_hash = null;
+        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+            $route_hash = null;
+            $route_settings = shopWholesaleHelper::getRouteSettings();
+        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_hash = 0;
+            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+        } else {
+            return $return;
+        }
+
         $product_model = new shopProductModel();
         $product = $product_model->getById($product_id);
         if ($sku_id) {
@@ -235,13 +276,13 @@ class shopWholesale {
             $sku = $sku_model->getById($sku_id);
         }
 
-        if ($domain_settings['product_count_setting'] && !self::checkMinProductCount($product, $quantity, $product_name, $min_product_count)) {
+        if ($route_settings['product_count_setting'] && !self::checkMinProductCount($product, $quantity, $product_name, $min_product_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_product_count);
+            $return['message'] = sprintf($route_settings['min_product_count_message'], $product_name, $min_product_count);
             $return['quantity'] = $min_product_count;
-        } elseif ($domain_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductCount($product, $quantity, $product_name, $multiplicity_product_count)) {
+        } elseif ($route_settings['product_multiplicity_setting'] && !self::checkMultiplicityProductCount($product, $quantity, $product_name, $multiplicity_product_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_product_count);
+            $return['message'] = sprintf($route_settings['multiplicity_product_message'], $product_name, $multiplicity_product_count);
             if ($old_quantity < $quantity) {
                 $k = ceil($quantity / $multiplicity_product_count);
                 $set_quantity = $k * $multiplicity_product_count;
@@ -253,13 +294,13 @@ class shopWholesale {
                 $set_quantity = $multiplicity_product_count;
             }
             $return['quantity'] = $set_quantity;
-        } elseif ($domain_settings['sku_count_setting'] && !empty($sku) && !self::checkMinSkuCount($sku, $quantity, $product_name, $min_sku_count)) {
+        } elseif ($route_settings['sku_count_setting'] && !empty($sku) && !self::checkMinSkuCount($sku, $quantity, $product_name, $min_sku_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['min_product_count_message'], $product_name, $min_sku_count);
+            $return['message'] = sprintf($route_settings['min_product_count_message'], $product_name, $min_sku_count);
             $return['quantity'] = $min_sku_count;
-        } elseif ($domain_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkuCount($sku, $quantity, $product_name, $multiplicity_sku_count)) {
+        } elseif ($route_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkuCount($sku, $quantity, $product_name, $multiplicity_sku_count)) {
             $return['result'] = false;
-            $return['message'] = sprintf($domain_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
+            $return['message'] = sprintf($route_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
             if ($old_quantity < $quantity) {
                 $k = ceil($quantity / $multiplicity_sku_count);
                 $set_quantity = $k * $multiplicity_sku_count;
@@ -271,10 +312,6 @@ class shopWholesale {
                 $set_quantity = $multiplicity_sku_count;
             }
             $return['quantity'] = $set_quantity;
-        } else {
-            $return['result'] = true;
-            $return['message'] = '';
-            $return['quantity'] = $quantity;
         }
 
         return $return;

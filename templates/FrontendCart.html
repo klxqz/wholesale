@@ -23,6 +23,11 @@
                     } else {
                         wholesale.text(data.data.check.message);
                     }
+                },
+                error: function (jqXHR, errorText) {
+                    loading.remove();
+                    checkout_button.removeAttr('disabled');
+                    console.log(jqXHR.responseText);
                 }
             });
         });

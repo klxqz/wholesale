@@ -15,13 +15,14 @@
                 }
                 this.submitForm();
                 this.changeShipping();
+                $('input[name=shipping_id]:checked').change();
             },
             locking: function () {
-                $('.checkout-form input[type="submit"]').hide();
+                $('.checkout-form input[type="submit"]').attr('disabled', true);
                 $('.shipping_wholesale').text(this.options.wholesale_message);
             },
             unlocking: function () {
-                $('.checkout-form input[type="submit"]').show();
+                $('.checkout-form input[type="submit"]').removeAttr('disabled');
                 $('.shipping_wholesale').text('');
             },
             submitForm: function () {
@@ -33,7 +34,7 @@
                 });
             }, changeShipping: function () {
                 var self = this;
-                $(document).on('click', 'input[name=shipping_id]', function () {
+                $(document).off('change', 'input[name=shipping_id]').on('change', 'input[name=shipping_id]', function () {
                     var shipping_id = $(this).val();
                     $('.shipping_wholesale').html('<i class="icon16 loading"></i>');
                     $('.checkout-form .checkout-step-content:not(.auth) input[type="submit"]').attr('disabled', true);
@@ -42,7 +43,7 @@
                         url: self.options.checkUrl,
                         dataType: 'json',
                         data: {
-                            'shipping_id': shipping_id
+                            shipping_id: shipping_id
                         },
                         success: function (data, textStatus, jqXHR) {
                             $('.checkout-form .checkout-step-content:not(.auth) input[type="submit"]').removeAttr('disabled');
@@ -61,9 +62,7 @@
     })(jQuery);
     $(function () {
         $.wholesale_shipping_plugin.init({
-            'checkUrl': '{$wa_app_url}wholesale/shipping/',
-            'wholesale_check': {if $wholesale.result|default:1}1{else}0{/if},
-            'wholesale_message': '{$wholesale.message|default:''}'
+            'checkUrl': '{$wa_app_url}wholesale/shipping/'
         });
     });
 
