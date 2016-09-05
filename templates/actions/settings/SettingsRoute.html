@@ -304,7 +304,7 @@
             Селектор кнопки "Далее" на шаге доставки
         </div>
         <div class="value">
-            <input type="text" value="{$route_settings.shipping_submit_selector|default:'.step-shipping input[type=submit]'|escape}" name="route_settings[shipping_submit_selector]" />
+            <input type="text" value="{$route_settings.shipping_submit_selector|default:'.step-shipping .checkout-step-content:not(.auth) input[type=submit]'|escape}" name="route_settings[shipping_submit_selector]" />
             <p>Плагин блокирует кнопку "Далее" используя указанный селектор</p>
         </div>
     </div>
