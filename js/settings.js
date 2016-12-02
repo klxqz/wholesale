@@ -37,7 +37,7 @@
 
         },
         initRouteSelector: function () {
-            var ids = this.options.ids;
+            var templates = this.options.templates;
             $('#route-selector').change(function () {
                 var self = $(this);
                 var loading = $('<i class="icon16 loading"></i>');
@@ -51,15 +51,29 @@
                     self.removeAttr('disabled');
                     $('.route-container').slideDown('slow');
 
-                    $('.route-container .ibutton').iButton({
+                    $('.route-container .ibutton:not(.s-ibutton-enabled-field)').iButton({
                         labelOn: "Вкл",
                         labelOff: "Выкл",
                         className: 'mini'
                     });
 
-                    for (var i = 0; i < ids.length; i++) {
-                        CodeMirror.fromTextArea(document.getElementById(ids[i]), {
-                            mode: "text/html",
+                    $('.s-ibutton-enabled-field.ibutton').iButton({
+                        labelOn: "Вкл",
+                        labelOff: "Выкл",
+                        className: 'mini'
+                    }).change(function () {
+                        var self = $(this);
+                        var enabled = self.is(':checked');
+                        if (enabled) {
+                            self.closest('.field').siblings('.field').show(200);
+                        } else {
+                            self.closest('.field').siblings('.field').hide(200);
+                        }
+                    });
+
+                    for (var i = 0; i < templates.length; i++) {
+                        CodeMirror.fromTextArea(document.getElementById(templates[i].id), {
+                            mode: "text/" + templates[i].mode,
                             tabMode: "indent",
                             height: "dynamic",
                             lineWrapping: true

@@ -9,8 +9,8 @@ class shopWholesalePluginSettingsAction extends waViewAction {
     public function execute() {
         $this->view->assign(array(
             'templates' => shopWholesalePlugin::$templates,
-            'settings' => wa()->getPlugin('wholesale')->getSettings(),
-            'route_hashs' => shopWholesaleHelper::getRouteHashs(),
+            'plugin' => wa()->getPlugin('wholesale'),
+            'route_hashs' => shopWholesaleRouteHelper::getRouteHashs(),
         ));
     }
 

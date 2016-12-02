@@ -7,26 +7,12 @@
 class shopWholesalePlugin extends shopPlugin {
 
     public static $templates = array(
-        'cart' => array(
-            'name' => 'Шаблон для страницы корзины',
-            'tpl_path' => 'plugins/wholesale/templates/',
-            'tpl_name' => 'FrontendCart',
-            'tpl_ext' => 'html',
-            'public' => false
-        ),
-        'shipping' => array(
-            'name' => 'Шаблон для страницы доставки',
-            'tpl_path' => 'plugins/wholesale/templates/',
-            'tpl_name' => 'Shipping',
-            'tpl_ext' => 'html',
-            'public' => false
-        ),
-        'product' => array(
-            'name' => 'Шаблон для страницы товара',
-            'tpl_path' => 'plugins/wholesale/templates/',
-            'tpl_name' => 'FrontendProduct',
-            'tpl_ext' => 'html',
-            'public' => false
+        'wholesale_js' => array(
+            'name' => 'wholesale.js',
+            'tpl_path' => 'plugins/wholesale/js/',
+            'tpl_name' => 'wholesale',
+            'tpl_ext' => 'js',
+            'public' => true
         ),
     );
 
@@ -59,7 +45,7 @@ class shopWholesalePlugin extends shopPlugin {
                     $template_path = wa()->getAppPath($tpl_full_path, 'shop');
                 }
                 $content = file_get_contents($template_path);
-                if (!empty($template['template']) && $template['template'] != $content) {
+                if (!empty($template['template']) && strcmp(str_replace("\r", "", $template['template']), str_replace("\r", "", $content)) != 0) {
                     $tpl_full_path = $s_template['tpl_path'] . $route_hash . '.' . $s_template['tpl_name'] . '.' . $s_template['tpl_ext'];
                     $template_path = wa()->getDataPath($tpl_full_path, $s_template['public'], 'shop', true);
                     $f = fopen($template_path, 'w');
@@ -79,25 +65,16 @@ class shopWholesalePlugin extends shopPlugin {
             $view = wa()->getView();
             $view->assign('sku', $sku);
             $view->assign('sku_id', $params['sku_id']);
-            $html = $view->fetch('plugins/wholesale/templates/BackendProductSkuSettings.html');
+            $html = $view->fetch('plugins/wholesale/templates/actions/backend/BackendProductSkuSettings.html');
             return $html;
         }
     }
 
     public function backendProductEdit($product) {
         if ($this->getSettings('status')) {
-            $html = '<div class="field">
-                        <div class="name">Минимальное количество товара для заказа</div>
-                        <div class="value no-shift">
-                            <input type="text" name="product[wholesale_min_product_count]" value="' . $product->wholesale_min_product_count . '" class="bold numerical small">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="name">Кратность заказываемого товара</div>
-                        <div class="value no-shift">
-                            <input type="text" name="product[wholesale_multiplicity]" value="' . $product->wholesale_multiplicity . '" class="bold numerical small">
-                        </div>
-                    </div>';
+            $view = wa()->getView();
+            $view->assign('product', $product);
+            $html = $view->fetch('plugins/wholesale/templates/actions/backend/BackendProductEdit.html');
             return array('basics' => $html);
         }
     }
@@ -106,9 +83,25 @@ class shopWholesalePlugin extends shopPlugin {
         if ($this->getSettings('status')) {
             $view = wa()->getView();
             $view->assign('category', $category);
-            $template_path = wa()->getAppPath('plugins/wholesale/templates/CategoryField.html', 'shop');
+            $template_path = wa()->getAppPath('plugins/wholesale/templates/actions/backend/BackendCategoryDialog.html', 'shop');
             $html = $view->fetch($template_path);
             return $html;
+        }
+    }
+
+    public function categorySave($category) {
+        if ($this->getSettings('status')) {
+            $update = array();
+            if (($wholesale_min_sum = waRequest::post('wholesale_min_sum', -1)) != -1) {
+                $update['wholesale_min_sum'] = $wholesale_min_sum;
+            }
+            if (($wholesale_min_product_count = waRequest::post('wholesale_min_product_count', -1)) != -1) {
+                $update['wholesale_min_product_count'] = $wholesale_min_product_count;
+            }
+            if ($update) {
+                $category_model = new shopCategoryModel();
+                $category_model->updateById($category['id'], $update);
+            }
         }
     }
 
@@ -118,12 +111,12 @@ class shopWholesalePlugin extends shopPlugin {
             return false;
         }
         $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+        if (shopWholesaleRouteHelper::getRouteSettings(null, 'status')) {
             $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings();
+        } elseif (shopWholesaleRouteHelper::getRouteSettings(0, 'status')) {
             $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings(0);
         } else {
             return false;
         }
@@ -159,10 +152,21 @@ class shopWholesalePlugin extends shopPlugin {
         }
 
         if ($param['step'] == 'shipping') {
-            $view = wa()->getView();
-            $shipping_template = shopWholesaleHelper::getRouteTemplates($route_hash, 'shipping');
-            $view->assign('settings', $route_settings);
-            return $view->fetch('string:' . $shipping_template['template']);
+            $wholesale_js_url = shopWholesaleRouteHelper::getRouteTemplateUrl('wholesale_js', $route_hash);
+
+            $shipping_submit_selector = $route_settings['shipping_submit_selector'];
+            $url = wa()->getRouteUrl('shop/frontend/shipping', array('plugin' => 'wholesale'));
+            return <<<HTML
+<script type="text/javascript" src="{$wholesale_js_url}"></script>
+<script type="text/javascript">
+    $(function () {
+        $.wholesale.shipping.init({
+            url: '{$url}',
+            shipping_submit_selector: '{$shipping_submit_selector}'
+        });
+    });
+</script>
+HTML;
         }
     }
 
@@ -178,12 +182,12 @@ class shopWholesalePlugin extends shopPlugin {
             return false;
         }
         $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+        if (shopWholesaleRouteHelper::getRouteSettings(null, 'status')) {
             $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings();
+        } elseif (shopWholesaleRouteHelper::getRouteSettings(0, 'status')) {
             $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings(0);
         } else {
             return false;
         }
@@ -194,7 +198,7 @@ class shopWholesalePlugin extends shopPlugin {
             }
         }
 
-        if ($route_settings['sku_count_setting'] && !shopWholesale::checkMinSkusCartCount($product_name, $min_sku_count, $item) && $route_settings['auto_add_sku_count_setting']) {
+        if ($route_settings['product_count_setting'] && !shopWholesale::checkMinSkusCartCount($product_name, $min_sku_count, $item) && $route_settings['auto_add_product_count_setting']) {
             if ($item) {
                 $this->setQuantity($item['id'], $min_sku_count);
             }
@@ -206,7 +210,7 @@ class shopWholesalePlugin extends shopPlugin {
                 $this->setQuantity($item['id'], $quantity);
             }
         }
-        if ($route_settings['sku_multiplicity_setting'] && !shopWholesale::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count, $item) && $route_settings['auto_add_sku_multiplicity_setting']) {
+        if ($route_settings['product_multiplicity_setting'] && !shopWholesale::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count, $item) && $route_settings['auto_add_product_multiplicity_setting']) {
             if ($item) {
                 $k = ceil($item['quantity'] / $multiplicity_sku_count);
                 $quantity = $k * $multiplicity_sku_count;
@@ -214,81 +218,73 @@ class shopWholesalePlugin extends shopPlugin {
             }
         }
 
+        $wholesale_js_url = shopWholesaleRouteHelper::getRouteTemplateUrl('wholesale_js', $route_hash);
 
-        if ($route_settings['frontend_cart_output']) {
-            return self::displayFrontendCart();
-        }
-    }
-
-    public static function display() {
-        return self::displayFrontendCart();
-    }
-
-    public static function displayFrontendCart() {
-        $plugin = wa()->getPlugin('wholesale');
-        if (!$plugin->getSettings('status')) {
-            return false;
-        }
-        $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
-            $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
-            $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
-        } else {
-            return false;
-        }
-        $template = shopWholesaleHelper::getRouteTemplates($route_hash, 'cart');
-        $view = wa()->getView();
-        $html = $view->fetch('string:' . $template['template']);
-        return $html;
+        $cart_total_selector = $route_settings['cart_total_selector'];
+        $checkout_selector = $route_settings['checkout_selector'];
+        $url = wa()->getRouteUrl('shop/frontend/cart', array('plugin' => 'wholesale'));
+        return <<<HTML
+<script type="text/javascript" src="{$wholesale_js_url}"></script> 
+<script type="text/javascript">
+    $(function () {
+        $.wholesale.cart.init({
+            url: '{$url}',
+            checkout_selector: '{$checkout_selector}',
+            cart_total_selector: '{$cart_total_selector}'
+        });
+    });
+</script>
+HTML;
     }
 
     public function frontendProduct($product) {
-        $plugin = wa()->getPlugin('wholesale');
-        if (!$plugin->getSettings('status')) {
+        if (!$this->getSettings('status')) {
             return false;
         }
         $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+        if (shopWholesaleRouteHelper::getRouteSettings(null, 'status')) {
             $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings();
+        } elseif (shopWholesaleRouteHelper::getRouteSettings(0, 'status')) {
             $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings(0);
         } else {
             return false;
         }
 
-        if (!empty($route_settings['frontend_product_output'])) {
-            return array('cart' => self::displayFrontendProduct());
-        }
+        $wholesale_js_url = shopWholesaleRouteHelper::getRouteTemplateUrl('wholesale_js', $route_hash);
+
+        $product_cart_form_selector = $route_settings['product_cart_form_selector'];
+        $product_add2cart_selector = $route_settings['product_add2cart_selector'];
+        $product_message = $route_settings['product_message'];
+        $url = wa()->getRouteUrl('shop/frontend/product', array('plugin' => 'wholesale'));
+        $html = <<<HTML
+<script type="text/javascript" src="{$wholesale_js_url}"></script>
+<script type="text/javascript">
+    $(function () {
+        $.wholesale.product.init({
+            url: '{$url}',
+            product_cart_form_selector: '{$product_cart_form_selector}',
+            product_add2cart_selector: '{$product_add2cart_selector}',
+            product_message: {$product_message}
+        });
+    });
+</script>
+HTML;
+        return array('cart' => $html);
+    }
+
+    //устаревшие методы
+    public static function display() {
+        return false;
+    }
+
+    public static function displayFrontendCart() {
+        return false;
     }
 
     public static function displayFrontendProduct() {
-        $plugin = wa()->getPlugin('wholesale');
-        if (!$plugin->getSettings('status')) {
-            return false;
-        }
-        $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
-            $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
-            $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
-        } else {
-            return false;
-        }
-
-        if (empty($route_settings['frontend_product'])) {
-            return false;
-        }
-        $template = shopWholesaleHelper::getRouteTemplates($route_hash, 'product');
-        $view = wa()->getView();
-        $view->assign('settings', $route_settings);
-        return $view->fetch('string:' . $template['template']);
+        return false;
     }
 
 }

@@ -9,7 +9,7 @@ return array(
     'description' => 'Ограничение минимального заказа',
     'img' => 'img/wholesale.png',
     'vendor' => '985310',
-    'version' => '3.5.1',
+    'version' => '3.6.0',
     'rights' => false,
     'frontend' => true,
     'shop_settings' => true,
@@ -20,5 +20,6 @@ return array(
         'backend_category_dialog' => 'backendCategoryDialog',
         'backend_product_sku_settings' => 'backendProductSkuSettings',
         'frontend_product' => 'frontendProduct',
+        'category_save' => 'categorySave',
     )
 );

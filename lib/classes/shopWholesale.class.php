@@ -1,148 +1,6 @@
 <?php
 
 class shopWholesale {
-    /*
-      public static function getRouteHash() {
-      $domain = wa()->getRouting()->getDomain(null, true);
-      $route = wa()->getRouting()->getRoute();
-      return md5($domain . '/' . $route['url']);
-      }
-     */
-    /*
-      public static function getDomainsSettings() {
-
-      $cache = new waSerializeCache('shopWholesalePlugin');
-
-      if ($cache && $cache->isCached()) {
-      $domains_settings = $cache->get();
-      } else {
-      $app_settings_model = new waAppSettingsModel();
-      $routing = wa()->getRouting();
-      $domains_routes = $routing->getByApp('shop');
-      $app_settings_model->get(shopWholesalePlugin::$plugin_id, 'domains_settings');
-      $domains_settings = json_decode($app_settings_model->get(shopWholesalePlugin::$plugin_id, 'domains_settings'), true);
-
-      if (empty($domains_settings)) {
-      $domains_settings = array();
-      }
-
-      foreach ($domains_routes as $domain => $routes) {
-      foreach ($routes as $route) {
-      $domain_route = md5($domain . '/' . $route['url']);
-      if (empty($domains_settings[$domain_route])) {
-      $domains_settings[$domain_route] = shopWholesalePlugin::$default_settings;
-      }
-      foreach (shopWholesalePlugin::$default_settings as $key => $value) {
-      if (!isset($domains_settings[$domain_route][$key])) {
-      $domains_settings[$domain_route][$key] = $value;
-      }
-      }
-
-      foreach (shopWholesalePlugin::$default_settings['templates'] as $tpl_name => $tpl) {
-      $domains_settings[$domain_route]['templates'][$tpl_name] = $tpl;
-
-      $tpl_full_path = $tpl['tpl_path'] . $domain_route . '_' . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
-      $domains_settings[$domain_route]['templates'][$tpl_name]['tpl_full_path'] = $tpl_full_path;
-      $template_path = wa()->getDataPath($tpl_full_path, $tpl['public'], 'shop', true);
-
-
-      if (file_exists($template_path)) {
-      $domains_settings[$domain_route]['templates'][$tpl_name]['template_path'] = $template_path;
-      $domains_settings[$domain_route]['templates'][$tpl_name]['template'] = file_get_contents($template_path);
-      $domains_settings[$domain_route]['templates'][$tpl_name]['change_tpl'] = 1;
-      } else {
-      $domains_settings[$domain_route]['templates'][$tpl_name]['tpl_full_path'] = $tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
-      $template_path = wa()->getAppPath($tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'], 'shop');
-      $domains_settings[$domain_route]['templates'][$tpl_name]['template_path'] = $template_path;
-      $domains_settings[$domain_route]['templates'][$tpl_name]['template'] = file_get_contents($template_path);
-      $domains_settings[$domain_route]['templates'][$tpl_name]['change_tpl'] = 0;
-      }
-      }
-      }
-
-      if ($domains_settings && $cache) {
-      $cache->set($domains_settings);
-      }
-      }
-      }
-
-      return $domains_settings;
-      }
-     * 
-     */
-    /*
-      public static function saveDomainsSettings($domains_settings) {
-
-
-      $app_settings_model = new waAppSettingsModel();
-      $routing = wa()->getRouting();
-      $domains_routes = $routing->getByApp('shop');
-
-      foreach ($domains_routes as $domain => $routes) {
-      foreach ($routes as $route) {
-      $domain_route = md5($domain . '/' . $route['url']);
-
-      foreach (shopWholesalePlugin::$default_settings['templates'] as $id => $template) {
-      $tpl_full_path = $template['tpl_path'] . $domain_route . '_' . $template['tpl_name'] . '.' . $template['tpl_ext'];
-      $template_path = wa()->getDataPath($tpl_full_path, $template['public'], 'shop', true);
-
-      @unlink($template_path);
-      if (empty($domains_settings[$domain_route]['templates'][$id]['reset_tpl'])) {
-      $source_path = wa()->getAppPath($template['tpl_path'] . $template['tpl_name'] . '.' . $template['tpl_ext'], 'shop');
-      $source_content = file_get_contents($source_path);
-
-
-      if (!isset($domains_settings[$domain_route]['templates'][$id]['template'])) {
-      continue;
-      }
-
-      $post_template = $domains_settings[$domain_route]['templates'][$id]['template'];
-
-      if ($source_content != $post_template) {
-      $f = fopen($template_path, 'w');
-      if (!$f) {
-      throw new waException('Не удаётся сохранить шаблон. Проверьте права на запись ' . $template_path);
-      }
-      fwrite($f, $post_template);
-      fclose($f);
-      }
-      }
-      }
-      unset($domains_settings[$domain_route]['templates']);
-      }
-      }
-
-      $app_settings_model->set(shopWholesalePlugin::$plugin_id, 'domains_settings', json_encode($domains_settings));
-      $cache = new waSerializeCache('shopWholesalePlugin');
-      if ($cache && $cache->isCached()) {
-      $cache->delete();
-      }
-      }
-     */
-    /*
-      public static function getDomainSettings() {
-      $domains_settings = self::getDomainsSettings();
-      $hash = self::getRouteHash();
-
-      $domain_settings = array();
-      if (!empty($domains_settings[$hash])) {
-      $domain_settings = $domains_settings[$hash];
-      } else {
-      $domain_settings = shopWholesalePlugin::$default_settings;
-      foreach ($domain_settings['templates'] as $tpl_name => $tpl) {
-      $domain_settings['templates'][$tpl_name] = $tpl;
-
-      $domain_settings['templates'][$tpl_name]['tpl_full_path'] = $tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'];
-      $template_path = wa()->getAppPath($tpl['tpl_path'] . $tpl['tpl_name'] . '.' . $tpl['tpl_ext'], 'shop');
-      $domain_settings['templates'][$tpl_name]['template_path'] = $template_path;
-      $domain_settings['templates'][$tpl_name]['template'] = file_get_contents($template_path);
-      $domain_settings['templates'][$tpl_name]['change_tpl'] = 0;
-      }
-      }
-
-      return $domain_settings;
-      }
-     */
 
     /**
      * Проверка текущего заказ на соответсвие минимальным требованиям.
@@ -158,29 +16,29 @@ class shopWholesale {
         );
 
         $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+        if (shopWholesaleRouteHelper::getRouteSettings(null, 'status')) {
             $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings();
+        } elseif (shopWholesaleRouteHelper::getRouteSettings(0, 'status')) {
             $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings(0);
         } else {
             return $return;
         }
 
         $cart = new shopCart();
-        $def_currency = wa('shop')->getConfig()->getCurrency(true);
-        $cur_currency = wa('shop')->getConfig()->getCurrency(false);
+        $primary_currency = wa('shop')->getConfig()->getCurrency(true);
+        $frontend_currency = wa('shop')->getConfig()->getCurrency(false);
 
         $total = $cart->total(true);
-        $total = shop_currency($total, $cur_currency, $def_currency, false);
+        $total = shop_currency($total, $frontend_currency, $primary_currency, false);
         $min_order_sum = $route_settings['min_order_sum'];
         $min_order_sum_format = shop_currency($min_order_sum);
 
-        if ($total < $min_order_sum) {
+        if ($route_settings['min_order_sum_enabled'] && $total < $min_order_sum) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['min_order_sum_message'], $min_order_sum_format);
-        } elseif ($cart->count() < $route_settings['min_order_products']) {
+        } elseif ($route_settings['min_order_products_enabled'] && $cart->count() < $route_settings['min_order_products']) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['min_order_products_message'], $route_settings['min_order_products']);
         } elseif ($route_settings['product_count_setting'] && !self::checkMinProductsCartCount($product_name, $min_product_count)) {
@@ -195,10 +53,10 @@ class shopWholesale {
         } elseif ($route_settings['category_count_setting'] && !self::checkMinCategoryCount($category_name, $min_category_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['min_order_count_category_message'], $category_name, $min_category_count);
-        } elseif ($route_settings['sku_count_setting'] && !self::checkMinSkusCartCount($product_name, $min_sku_count)) {
+        } elseif ($route_settings['product_count_setting'] && !self::checkMinSkusCartCount($product_name, $min_sku_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['min_product_count_message'], $product_name, $min_sku_count);
-        } elseif ($route_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count)) {
+        } elseif ($route_settings['product_multiplicity_setting'] && !self::checkMultiplicitySkusCartCount($product_name, $multiplicity_sku_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
         }
@@ -220,12 +78,12 @@ class shopWholesale {
         );
 
         $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+        if (shopWholesaleRouteHelper::getRouteSettings(null, 'status')) {
             $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings();
+        } elseif (shopWholesaleRouteHelper::getRouteSettings(0, 'status')) {
             $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings(0);
         } else {
             return $return;
         }
@@ -259,12 +117,12 @@ class shopWholesale {
             'quantity' => $quantity,
         );
         $route_hash = null;
-        if (shopWholesaleHelper::getRouteSettings(null, 'status')) {
+        if (shopWholesaleRouteHelper::getRouteSettings(null, 'status')) {
             $route_hash = null;
-            $route_settings = shopWholesaleHelper::getRouteSettings();
-        } elseif (shopWholesaleHelper::getRouteSettings(0, 'status')) {
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings();
+        } elseif (shopWholesaleRouteHelper::getRouteSettings(0, 'status')) {
             $route_hash = 0;
-            $route_settings = shopWholesaleHelper::getRouteSettings(0);
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings(0);
         } else {
             return $return;
         }
@@ -294,11 +152,11 @@ class shopWholesale {
                 $set_quantity = $multiplicity_product_count;
             }
             $return['quantity'] = $set_quantity;
-        } elseif ($route_settings['sku_count_setting'] && !empty($sku) && !self::checkMinSkuCount($sku, $quantity, $product_name, $min_sku_count)) {
+        } elseif ($route_settings['product_count_setting'] && !empty($sku) && !self::checkMinSkuCount($sku, $quantity, $product_name, $min_sku_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['min_product_count_message'], $product_name, $min_sku_count);
             $return['quantity'] = $min_sku_count;
-        } elseif ($route_settings['sku_multiplicity_setting'] && !self::checkMultiplicitySkuCount($sku, $quantity, $product_name, $multiplicity_sku_count)) {
+        } elseif ($route_settings['product_multiplicity_setting'] && !self::checkMultiplicitySkuCount($sku, $quantity, $product_name, $multiplicity_sku_count)) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['multiplicity_product_message'], $product_name, $multiplicity_sku_count);
             if ($old_quantity < $quantity) {
@@ -328,19 +186,25 @@ class shopWholesale {
     public static function checkMinCategoryCount(&$category_name = null, &$min_category_count = null) {
         $cart = new shopCart();
         $items = $cart->items();
+        $wholesale_categories = array();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
-                $product = new shopProduct($item['product']['id']);
-                foreach ($product->categories as $category) {
-                    $category_min_count = self::getCategoryMinCount($category['id'], $category_name);
-                    $category_count = self::getCategoryProductsCount($category['id']);
-                    if ($category_count < $category_min_count) {
-                        $min_category_count = $category_min_count;
-                        return false;
-                    }
+                if (self::getCategoryMinCount($item['product']['category_id'], $category)) {
+                    $wholesale_categories[] = $category;
                 }
             }
         }
+        if ($wholesale_categories) {
+            foreach ($wholesale_categories as $wholesale_category) {
+                $category_count = self::getCategoryProductsCount($wholesale_category['id']);
+                if ($category_count < $wholesale_category['wholesale_min_product_count']) {
+                    $min_category_count = $wholesale_category['wholesale_min_product_count'];
+                    $category_name = $wholesale_category['name'];
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
@@ -371,15 +235,13 @@ class shopWholesale {
      * @param string $category_name - имя категории, для которой установлено ограничение минимального количества товаров.
      * @return int
      */
-    public static function getCategoryMinCount($category_id, &$category_name) {
-
+    public static function getCategoryMinCount($category_id, &$category) {
         $category_model = new shopCategoryModel();
         $category = $category_model->getById($category_id);
         if ($category['wholesale_min_product_count'] > 0) {
-            $category_name = $category['name'];
             return $category['wholesale_min_product_count'];
         } elseif ($category['parent_id']) {
-            return self::getCategoryMinCount($category['parent_id'], $category_name);
+            return self::getCategoryMinCount($category['parent_id'], $category);
         }
         return 0;
     }
@@ -395,12 +257,20 @@ class shopWholesale {
     public static function checkMinCategorySum(&$category_name = null, &$min_category_sum = null) {
         $cart = new shopCart();
         $items = $cart->items();
+        $wholesale_categories = array();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
-                $category_min_sum = self::getCategoryMinSum($item['product']['category_id'], $category_name);
-                $category_sum = self::getCategoryProductsSum($item['product']['category_id']);
-                if ($category_sum < $category_min_sum) {
-                    $min_category_sum = $category_min_sum;
+                if (self::getCategoryMinSum($item['product']['category_id'], $category)) {
+                    $wholesale_categories[] = $category;
+                }
+            }
+        }
+        if ($wholesale_categories) {
+            foreach ($wholesale_categories as $wholesale_category) {
+                $category_sum = self::getCategoryProductsSum($wholesale_category['id']);
+                if ($category_sum < $wholesale_category['wholesale_min_sum']) {
+                    $min_category_sum = $wholesale_category['wholesale_min_sum'];
+                    $category_name = $wholesale_category['name'];
                     return false;
                 }
             }
@@ -420,9 +290,10 @@ class shopWholesale {
         $sum = 0;
         $cart = new shopCart();
         $items = $cart->items();
+        $primary_currency = wa('shop')->getConfig()->getCurrency(true);
         foreach ($items as $item) {
             if ($item['type'] == 'product' && self::inCategory($category, $item['product'])) {
-                $sum += $item['price'] * $item['quantity'];
+                $sum += shop_currency($item['price'], $item['product']['currency'], $primary_currency, false) * $item['quantity'];
             }
         }
         return $sum;
@@ -436,14 +307,13 @@ class shopWholesale {
      * @param string $category_name - имя категории, для которой установлено ограничение минимального количества товаров.
      * @return int
      */
-    public static function getCategoryMinSum($category_id, &$category_name) {
+    public static function getCategoryMinSum($category_id, &$category) {
         $category_model = new shopCategoryModel();
         $category = $category_model->getById($category_id);
         if ($category['wholesale_min_sum'] > 0) {
-            $category_name = $category['name'];
             return $category['wholesale_min_sum'];
         } elseif ($category['parent_id']) {
-            return self::getCategoryMinSum($category['parent_id'], $category_name);
+            return self::getCategoryMinSum($category['parent_id'], $category);
         }
         return 0;
     }
@@ -456,13 +326,14 @@ class shopWholesale {
      * @return boolean
      */
     protected static function inCategory($category, $product) {
-
         if ($product['category_id'] == $category['id']) {
             return true;
-        } elseif ($category['parent_id']) {
+        } else {
             $category_model = new shopCategoryModel();
-            $category = $category_model->getById($category['parent_id']);
-            return self::inCategory($category, $product);
+            $subcategories = $category_model->getTree($category['id'], null, false);
+            if (!empty($subcategories[$product['category_id']])) {
+                return true;
+            }
         }
         return false;
     }
