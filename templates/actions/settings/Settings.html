@@ -20,12 +20,21 @@
     .plugin-menu li a{
         text-decoration: underline;
     }
+    .fields{
+        position: relative;
+    }
+    .field-group.fixed{
+        width: calc(100% - 253px);
+        position: fixed;
+        background: #fff;
+        z-index: 99;
+        margin: 0;
+        bottom: 0;
+    }
 </style>
 
 <ul class="plugin-menu">
-    {*<li><a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/wholesale/reviews/"><i class="icon16 star"></i>Оставить отзыв о плагине</a></li>*}
     <li><a href="http://support.wa-plugins.ru" target="_blank"><i class="icon16 ss pt hammer"></i>Поддержка</a></li>
-        {*<li><a target="_blank" href="http://wa-plugins.ru/"><i class="icon16 ss pt globe"></i>WA-PLUGINS.ru - сайт разработчика</a></li>*}
 </ul>
 
 <h1>{$plugin->getName()}</h1>
@@ -36,7 +45,7 @@
 
 
 <div class="fields form">
-    <form action="?module=plugins&id=wholesale&action=save" method="post" id="plugins-settings-form_">
+    <form action="?module=plugins&id=wholesale&action=save" method="post" id="plugins-settings-form">
         {$wa->csrf()}
 
         <div class="field-group">
@@ -73,10 +82,11 @@
             </div>
         </div>
 
-        <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
+        <div class="field-group submit fixed"{if !$settings.status|default:0} style="display:none"{/if}>
             <div class="field">
                 <div class="value submit">
                     <input type="submit" class="button green" value="Сохранить">
+                    <span class="hint">Ctrl+S</span>
                     <span id="plugins-settings-form-status" style="display:none">
                         <i style="vertical-align:middle" class="icon16 yes"></i> [`Saved`]
                     </span>
@@ -94,7 +104,7 @@
     {/if}
     {$tpls[] = ['id' => "sf-template-`$key`", 'mode' => $mode]}
 {/foreach}
-<script type="text/javascript" src="{$wa_app_static_url}plugins/wholesale/js/settings.js?{$wa->version()}"></script>
+<script type="text/javascript" src="{$wa_app_static_url}plugins/wholesale/js/settings.js?{$plugin->getVersion()}"></script>
 <script type="text/javascript">
     $(function () {
         $.wholesale_settings.init({

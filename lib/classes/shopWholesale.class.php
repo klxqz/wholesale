@@ -187,10 +187,14 @@ class shopWholesale {
         $cart = new shopCart();
         $items = $cart->items();
         $wholesale_categories = array();
+        $category_products_model = new shopCategoryProductsModel();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
-                if (self::getCategoryMinCount($item['product']['category_id'], $category)) {
-                    $wholesale_categories[] = $category;
+                $product_categories = $category_products_model->getByField('product_id', $item['product']['id'], true);
+                foreach ($product_categories as $product_category) {
+                    if (self::getCategoryMinCount($product_category['category_id'], $category)) {
+                        $wholesale_categories[] = $category;
+                    }
                 }
             }
         }
@@ -258,10 +262,14 @@ class shopWholesale {
         $cart = new shopCart();
         $items = $cart->items();
         $wholesale_categories = array();
+        $category_products_model = new shopCategoryProductsModel();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
-                if (self::getCategoryMinSum($item['product']['category_id'], $category)) {
-                    $wholesale_categories[] = $category;
+                $product_categories = $category_products_model->getByField('product_id', $item['product']['id'], true);
+                foreach ($product_categories as $product_category) {
+                    if (self::getCategoryMinSum($product_category['category_id'], $category)) {
+                        $wholesale_categories[] = $category;
+                    }
                 }
             }
         }

@@ -3,7 +3,7 @@
     <div class="field">
         <div class="name">Минимальная сумма всех товаров из этой категории и подкатегорий для осуществления заказа</div>
         <div class="value no-shift">
-            <input type="text" name="wholesale_min_sum" value="{(float)$category.wholesale_min_sum|escape}" class="bold numerical small">
+            <input type="text" name="wholesale_min_sum" value="{(float)$category.wholesale_min_sum|escape}" class="bold numerical small"> {$currency}
             <p class="hint">
                 Если покупатель добавил себе в корзину товары из этой категории или подкатегорий, 
                 то, для осуществления заказа, суммарная стоимость товаров из этой категории или подкатегорий не должна быть меньше установленного значения. 

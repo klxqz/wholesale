@@ -82,7 +82,10 @@ class shopWholesalePlugin extends shopPlugin {
     public function backendCategoryDialog($category) {
         if ($this->getSettings('status')) {
             $view = wa()->getView();
-            $view->assign('category', $category);
+            $view->assign(array(
+                'category' => $category,
+                'currency' => wa('shop')->getConfig()->getCurrency(true),
+            ));
             $template_path = wa()->getAppPath('plugins/wholesale/templates/actions/backend/BackendCategoryDialog.html', 'shop');
             $html = $view->fetch($template_path);
             return $html;
@@ -153,11 +156,12 @@ class shopWholesalePlugin extends shopPlugin {
 
         if ($param['step'] == 'shipping') {
             $wholesale_js_url = shopWholesaleRouteHelper::getRouteTemplateUrl('wholesale_js', $route_hash);
+            $version = $this->getVersion();
 
-            $shipping_submit_selector = $route_settings['shipping_submit_selector'];
+            $shipping_submit_selector = isset($route_settings['shipping_submit_selector']) ? $route_settings['shipping_submit_selector'] : '';
             $url = wa()->getRouteUrl('shop/frontend/shipping', array('plugin' => 'wholesale'));
             return <<<HTML
-<script type="text/javascript" src="{$wholesale_js_url}"></script>
+<script type="text/javascript" src="{$wholesale_js_url}?v{$version}"></script>
 <script type="text/javascript">
     $(function () {
         $.wholesale.shipping.init({
@@ -187,7 +191,7 @@ HTML;
             $route_settings = shopWholesaleRouteHelper::getRouteSettings();
         } elseif (shopWholesaleRouteHelper::getRouteSettings(0, 'status')) {
             $route_hash = 0;
-            $route_settings = shopWholesaleRouteHelper::getRouteSettings(0);
+            $route_settings = shopWholesaleRouteHelper::getRouteSettings($route_hash);
         } else {
             return false;
         }
@@ -219,12 +223,13 @@ HTML;
         }
 
         $wholesale_js_url = shopWholesaleRouteHelper::getRouteTemplateUrl('wholesale_js', $route_hash);
+        $version = $this->getVersion();
 
-        $cart_total_selector = $route_settings['cart_total_selector'];
-        $checkout_selector = $route_settings['checkout_selector'];
+        $cart_total_selector = isset($route_settings['cart_total_selector']) ? $route_settings['cart_total_selector'] : '';
+        $checkout_selector = isset($route_settings['checkout_selector']) ? $route_settings['checkout_selector'] : '';
         $url = wa()->getRouteUrl('shop/frontend/cart', array('plugin' => 'wholesale'));
         return <<<HTML
-<script type="text/javascript" src="{$wholesale_js_url}"></script> 
+<script type="text/javascript" src="{$wholesale_js_url}?v{$version}"></script> 
 <script type="text/javascript">
     $(function () {
         $.wholesale.cart.init({
@@ -253,13 +258,14 @@ HTML;
         }
 
         $wholesale_js_url = shopWholesaleRouteHelper::getRouteTemplateUrl('wholesale_js', $route_hash);
+        $version = $this->getVersion();
 
-        $product_cart_form_selector = $route_settings['product_cart_form_selector'];
-        $product_add2cart_selector = $route_settings['product_add2cart_selector'];
-        $product_message = $route_settings['product_message'];
+        $product_cart_form_selector = isset($route_settings['product_cart_form_selector']) ? $route_settings['product_cart_form_selector'] : '';
+        $product_add2cart_selector = isset($route_settings['product_add2cart_selector']) ? $route_settings['product_add2cart_selector'] : '';
+        $product_message = isset($route_settings['product_message']) ? $route_settings['product_message'] : '';
         $url = wa()->getRouteUrl('shop/frontend/product', array('plugin' => 'wholesale'));
         $html = <<<HTML
-<script type="text/javascript" src="{$wholesale_js_url}"></script>
+<script type="text/javascript" src="{$wholesale_js_url}"?v{$version}></script>
 <script type="text/javascript">
     $(function () {
         $.wholesale.product.init({

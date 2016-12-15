@@ -23,7 +23,7 @@ class shopWholesaleRouteHelper {
             fclose($f);
             $template_url = wa()->getDataUrl($tpl_full_path, true, 'shop');
         } elseif ($template['tpl_ext'] == 'js') {
-            
+
             if ($template['change_tpl']) {
                 $template_url = wa()->getDataUrl($template['tpl_full_path'], true, 'shop');
             } else {
@@ -98,8 +98,8 @@ class shopWholesaleRouteHelper {
 
     public static function getCurrentRouteHash() {
         $domain = wa()->getRouting()->getDomain(null, true);
-        $route = wa()->getRouteUrl('shop/frontend');
-        return md5($domain . $route . '*');
+        $route = wa()->getRouting()->getRoute();
+        return md5($domain . '/' . $route['url']);
     }
 
     public static function getRouteHashs() {

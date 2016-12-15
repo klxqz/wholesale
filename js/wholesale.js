@@ -10,9 +10,9 @@
 
                 if (!$('#wholesale-cart').length) {
                     if (this.options.is_onestep) {
-                        $('.onestep-cart .onestep-cart-form').after('<div id="wholesale-cart"></div>');
+                        $('.onestep-cart .onestep-cart-form').after('<div id="wholesale-cart" class="hidden" style="display:none;"></div>');
                     } else {
-                        $(this.options.checkout_selector).after('<div id="wholesale-cart"></div>');
+                        $(this.options.checkout_selector).after('<div id="wholesale-cart" class="hidden" style="display:none;"></div>');
                     }
                 }
                 this.options.wholesale_selector = '#wholesale-cart';
@@ -62,12 +62,22 @@
                 if (this.options.is_onestep) {
                     $('.onestep-cart .checkout').hide();
                     $(this.options.wholesale_selector).text(message);
+                    if (message) {
+                        $(this.options.wholesale_selector).removeClass('hidden').addClass('active').show();
+                    } else {
+                        $(this.options.wholesale_selector).removeClass('active').addClass('hidden').hide();
+                    }
                     if (loading && !$('#wholesale-cart-loading').length) {
                         $('<span id="wholesale-cart-loading"><i class="icon16 loading"></i> Пожалуйста, подождите...</span>').insertBefore('.onestep-cart .checkout');
                     }
                 } else {
                     $(this.options.checkout_selector).attr('disabled', true);
                     $(this.options.wholesale_selector).text(message);
+                    if (message) {
+                        $(this.options.wholesale_selector).removeClass('hidden').addClass('active').show();
+                    } else {
+                        $(this.options.wholesale_selector).removeClass('active').addClass('hidden').hide();
+                    }
                     if (loading && !$('#wholesale-cart-loading').length) {
                         $('<span id="wholesale-cart-loading"><i class="icon16 loading"></i> Пожалуйста, подождите...</span>').insertBefore(this.options.checkout_selector);
                     }
@@ -78,6 +88,7 @@
                     $('#wholesale-cart-loading').remove();
                 }
                 $(this.options.wholesale_selector).text('');
+                $(this.options.wholesale_selector).removeClass('active').addClass('hidden').hide();
                 if (this.options.is_onestep) {
                     $('.onestep-cart .checkout').show();
                 } else {
@@ -122,6 +133,7 @@
                 this.options.busy = false;
                 this.options.first = true;
                 this.initProductQuantityChange();
+                this.initSkuChange();
                 this.initUpdateProductQuantity();
             },
             checkSettings: function () {
@@ -139,6 +151,15 @@
                 }
                 return true;
             },
+            initSkuChange: function () {
+                $(this.options.product_cart_form_selector).find('[name=sku_id]').change(function () {
+                    $(document).trigger('updateProductQuantity');
+                });
+                $(this.options.product_cart_form_selector).find('[name*="features"]').change(function () {
+                    $(document).trigger('updateProductQuantity');
+                });
+
+            },
             initProductQuantityChange: function () {
                 var $input_quantity = this.options.input_quantity;
                 var quantity = '';
@@ -151,7 +172,7 @@
             },
             checkProduct: function () {
                 var wholesale = this;
-                if (!wholesale.options.busy) {
+                if (!wholesale.options.busy && !$(this.options.product_add2cart_selector).is(':disabled')) {
                     wholesale.options.busy = true;
                     var $form = $(this.options.product_cart_form_selector);
                     var $add2cart_button = $(this.options.product_add2cart_selector);
@@ -171,6 +192,7 @@
                                 $add2cart_button.removeAttr('disabled');
                             } else {
                                 $input_quantity.val(data.data.check.quantity);
+                                $add2cart_button.removeAttr('disabled');
                                 if (wholesale.options.product_message && !wholesale.options.first) {
                                     alert(data.data.check.message);
                                 }
@@ -195,6 +217,8 @@
             }
         },
         shipping: {
+            disabled: false,
+            message: '',
             options: {},
             init: function (options) {
                 this.options = options;
@@ -202,10 +226,15 @@
                     return false;
                 }
                 if (!$('#wholesale-shipping').length) {
-                    $(this.options.shipping_submit_selector).after('<div id="wholesale-shipping"></div>');
+                    if (this.options.is_onestep) {
+                        $('.checkout-content[data-step-id=shipping]').after('<div id="wholesale-shipping" class="hidden" style="display:none;"></div>');
+                    } else {
+                        $(this.options.shipping_submit_selector).after('<div id="wholesale-shipping" class="hidden" style="display:none;"></div>');
+                    }
                 }
                 this.options.wholesale_shipping = '#wholesale-shipping';
                 this.initChangeShipping();
+                this.initOnestepFormSubmit();
                 $('input[name=shipping_id]:checked').change();
             },
             checkSettings: function () {
@@ -221,6 +250,17 @@
                 }
                 return true;
             },
+            initOnestepFormSubmit: function () {
+                var self = this;
+                $('form.checkout-form').submit(function () {
+                    if (self.disabled) {
+                        if (self.message) {
+                            alert(self.message)
+                        }
+                        return false;
+                    }
+                });
+            },
             disableCheckout: function (loading, message) {
                 if ($('#wholesale-shipping-loading').length) {
                     $('#wholesale-shipping-loading').remove();
@@ -232,10 +272,22 @@
                     loading = false;
                 }
                 if (this.options.is_onestep) {
-                    $('.onestep-cart .checkout #checkout-btn').attr('disabled', true);
+                    this.disabled = true;
+                    this.message = message;
+                    $(this.options.wholesale_shipping).text(message);
+                    if (message) {
+                        $(this.options.wholesale_shipping).removeClass('hidden').addClass('active').show();
+                    } else {
+                        $(this.options.wholesale_shipping).removeClass('active').addClass('hidden').hide();
+                    }
                 } else {
                     $(this.options.shipping_submit_selector).attr('disabled', true);
                     $(this.options.wholesale_shipping).text(message);
+                    if (message) {
+                        $(this.options.wholesale_shipping).removeClass('hidden').addClass('active').show();
+                    } else {
+                        $(this.options.wholesale_shipping).removeClass('active').addClass('hidden').hide();
+                    }
                     if (loading && !$('#wholesale-shipping-loading').length) {
                         $('<span id="wholesale-shipping-loading"><i class="icon16 loading"></i> Пожалуйста, подождите...</span>').insertBefore(this.options.shipping_submit_selector);
                     }
@@ -245,10 +297,15 @@
                 if ($('#wholesale-shipping-loading').length) {
                     $('#wholesale-shipping-loading').remove();
                 }
-                $(this.options.wholesale_shipping).text('');
                 if (this.options.is_onestep) {
-                    $('.onestep-cart .checkout #checkout-btn').removeAttr('disabled');
+                    this.disabled = false;
+                    this.message = '';
+                    $(this.options.wholesale_shipping).text('');
+                    $(this.options.wholesale_shipping).removeClass('active').addClass('hidden').hide();
+                    $(this.options.shipping_submit_selector).removeAttr('disabled');
                 } else {
+                    $(this.options.wholesale_shipping).text('');
+                    $(this.options.wholesale_shipping).removeClass('active').addClass('hidden').hide();
                     $(this.options.shipping_submit_selector).removeAttr('disabled');
                 }
             },

@@ -72,11 +72,11 @@
         </div>
         <div class="value">
             <input type="hidden" value="0" name="route_settings[frontend_product]" />
-            <input class="ibutton s-ibutton-enabled-field" type="checkbox" value="1" name="route_settings[frontend_product]" {if $route_settings.frontend_product|default:1}checked="checked"{/if} />
+            <input class="ibutton s-ibutton-enabled-field" type="checkbox" value="1" name="route_settings[frontend_product]" {if $route_settings.frontend_product|default:0}checked="checked"{/if} />
             <p class="hint">Плагин проверяет количество товара для заказа и изменяет его согласно настройкам Минимального заказа</p>
         </div>
     </div>
-    <div class="field"{if !$route_settings.frontend_product|default:1} style="display:none"{/if}>
+    <div class="field"{if !$route_settings.frontend_product|default:0} style="display:none"{/if}>
         <div class="name">
             Селектор формы
         </div>
@@ -84,7 +84,7 @@
             <input type="text" value="{$route_settings.product_cart_form_selector|default:'form#cart-form'|escape}" name="route_settings[product_cart_form_selector]" />
         </div>
     </div>
-    <div class="field"{if !$route_settings.frontend_product|default:1} style="display:none"{/if}>
+    <div class="field"{if !$route_settings.frontend_product|default:0} style="display:none"{/if}>
         <div class="name">
             Селектор кнопки "В корзину"
         </div>
@@ -92,7 +92,7 @@
             <input type="text" value="{$route_settings.product_add2cart_selector|default:'form#cart-form [type=submit]'|escape}" name="route_settings[product_add2cart_selector]" />
         </div>
     </div>
-    <div class="field"{if !$route_settings.frontend_product|default:1} style="display:none"{/if}>
+    <div class="field"{if !$route_settings.frontend_product|default:0} style="display:none"{/if}>
         <div class="name">
             Выводить сообщение
         </div>
@@ -173,7 +173,7 @@
         </div>
         <div class="value">
             <input type="hidden" value="0" name="route_settings[product_count_setting]" />
-            <input class="ibutton s-ibutton-enabled-field" type="checkbox" value="1" name="route_settings[product_count_setting]"{if $route_settings.product_count_setting|default:1} checked="checked"{/if} />
+            <input class="ibutton s-ibutton-enabled-field" type="checkbox" value="1" name="route_settings[product_count_setting]"{if $route_settings.product_count_setting|default:0} checked="checked"{/if} />
         </div>
     </div>
     <div class="field"{if !$route_settings.product_count_setting|default:0} style="display: none;"{/if}>
@@ -205,13 +205,13 @@
         </div>
         <div class="value">
             <input type="hidden" value="0" name="route_settings[product_multiplicity_setting]" />
-            <input class="ibutton s-ibutton-enabled-field"  type="checkbox" value="1" name="route_settings[product_multiplicity_setting]" {if $route_settings.product_multiplicity_setting|default:1}checked="checked"{/if} />
+            <input class="ibutton s-ibutton-enabled-field"  type="checkbox" value="1" name="route_settings[product_multiplicity_setting]" {if $route_settings.product_multiplicity_setting|default:0}checked="checked"{/if} />
         </div>
         <p class="hint">Кратность позволяет продавать товар кратно какому-либо значению. 
             Например, установленная кратность для товара равная 3, позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
             При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
     </div>
-    <div class="field"{if !$route_settings.product_multiplicity_setting} style="display: none;"{/if}>
+    <div class="field"{if !$route_settings.product_multiplicity_setting|default:0} style="display: none;"{/if}>
         <div class="name">
             Использовать автоматическое добавление недостающего числа товаров и артикулов
         </div>
@@ -221,7 +221,7 @@
             <p class="hint">Если для товара установлено кратное количество и количество данного товара в корзине покупателя не является кратным, то плагин автоматически увеличит количество данного товара в корзине до кратного</p>
         </div>
     </div>
-    <div class="field"{if !$route_settings.product_multiplicity_setting} style="display: none;"{/if}>
+    <div class="field"{if !$route_settings.product_multiplicity_setting|default:0} style="display: none;"{/if}>
         <div class="name">
             Текст сообщения
         </div>
@@ -239,7 +239,7 @@
         </div>
         <div class="value">
             <input type="hidden" value="0" name="route_settings[category_sum_setting]" />
-            <input class="ibutton s-ibutton-enabled-field"  type="checkbox" value="1" name="route_settings[category_sum_setting]" {if $route_settings.category_sum_setting|default:1}checked="checked"{/if} />
+            <input class="ibutton s-ibutton-enabled-field"  type="checkbox" value="1" name="route_settings[category_sum_setting]" {if $route_settings.category_sum_setting|default:0}checked="checked"{/if} />
         </div>
     </div>
     <div class="field"{if !$route_settings.category_sum_setting|default:0} style="display: none;"{/if}>
@@ -261,7 +261,7 @@
         </div>
         <div class="value">
             <input type="hidden" value="0" name="route_settings[category_count_setting]" />
-            <input class="ibutton s-ibutton-enabled-field" type="checkbox" value="1" name="route_settings[category_count_setting]" {if $route_settings.category_count_setting|default:1}checked="checked"{/if} />
+            <input class="ibutton s-ibutton-enabled-field" type="checkbox" value="1" name="route_settings[category_count_setting]" {if $route_settings.category_count_setting|default:0}checked="checked"{/if} />
             <p class="hint">Задать настройки для каждой из категрий можно в разделе «Товары», затем выбрать нужную категорию и нажать «Настройки категории»</p>
         </div>
     </div>
@@ -294,7 +294,7 @@
             Селектор кнопки "Далее" на шаге доставки
         </div>
         <div class="value">
-            <input type="text" value="{$route_settings.shipping_submit_selector|default:'.step-shipping .checkout-step-content:not(.auth) [name=checkout]'|escape}" name="route_settings[shipping_submit_selector]" />
+            <input type="text" value="{$route_settings.shipping_submit_selector|default:'.step-shipping .checkout-step-content:not(.auth) [type=submit]'|escape}" name="route_settings[shipping_submit_selector]" />
             <p class="hint">Плагин блокирует кнопку "Далее" используя указанный селектор</p>
         </div>
     </div>
