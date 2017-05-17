@@ -20,9 +20,6 @@
     .plugin-menu li a{
         text-decoration: underline;
     }
-    .fields{
-        position: relative;
-    }
     .field-group.fixed{
         width: calc(100% - 253px);
         position: fixed;
@@ -39,7 +36,7 @@
 
 <h1>{$plugin->getName()}</h1>
 <p>
-    Плагин предоставляет задать ограничение на минимальный заказ. Ограничения могут относиться к минимальной сумме всего заказа, минимальному количеству, кратности товаров и артикулов...<br/>
+    Плагин позволяет задать ограничение на минимальный заказ. Ограничения могут относиться к минимальной сумме всего заказа, минимальному количеству, кратности товаров и артикулов...<br/>
     <a href="http://www.webasyst.ru/store/plugin/shop/wholesale/" target="_blank">Подробнее</a> <i class="icon10 new-window"></i>
 </p>
 
@@ -79,6 +76,44 @@
         <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
             <div class="route-container block double-padded">
 
+            </div>
+        </div>
+
+        <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
+            <h3>Расширьте функционал</h3>
+            <div class="field" id="wholesale-info">
+                <div class="name">
+                    <strong>Быстрый заказ</strong><br/><br/>
+                    <p class="hint">
+                        <strong>Интеграция плагинов</strong> «Минимальный заказ» и «Быстрый заказ» позволяет использовать плагину «Быстрый заказ» функции «Минимального заказа»
+                    </p>
+                </div>
+                <div class="value">
+                    <a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/instantorder/">
+                        <img src="{$plugin->getPluginStaticUrl()}img/instantorder.png" />
+                    </a>
+                    <p class="hint">
+                        Воспользуйтесь дополнительным плагином «<a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/instantorder/">Быстрый заказ</a>» для сокращения времени совершения покупки.<br/>
+                        Плагин позволяет оформить заказ во всплывающем окне в 1 клик с заполнением минимального количества полей, необходимых для совершения заказа
+                    </p>
+                </div>
+            </div>
+            <div class="field" id="wholesale-info">
+                <div class="name">
+                    <strong>Заказ на одной странице</strong><br/><br/>
+                    <p class="hint">
+                        <strong>Интеграция плагинов</strong><br/>
+                        Возможно настроить совместную работу плагинов «Минимальный заказ» и «Заказ на одной странице»
+                    </p>
+                </div>
+                <div class="value">
+                    <a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/onestep/">
+                        <img src="{$plugin->getPluginStaticUrl()}img/onestep.png" />
+                    </a>
+                    <p class="hint">
+                        Воспользуйтесь дополнительным плагином «<a target="_blank" href="https://www.webasyst.ru/store/plugin/shop/onestep/">Заказ на одной странице</a>» для упрощения и сокращения процедуры полного оформления заказа
+                    </p>
+                </div>
             </div>
         </div>
 

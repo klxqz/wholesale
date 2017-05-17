@@ -1,6 +1,45 @@
 <?php
 
-class shopWholesale {
+final class shopWholesale {
+
+    private static $items = array();
+
+    private static function getItems() {
+        if (self::$items) {
+            return self::$items;
+        } else {
+            $cart = new shopCart();
+            return $cart->items();
+        }
+    }
+
+    private static function getTotal() {
+        if (self::$items) {
+            $total = 0;
+            foreach (self::$items as $item) {
+                $total += $item['price'] * $item['quantity'];
+            }
+            return $total;
+        } else {
+            $cart = new shopCart();
+            return $cart->total(true);
+        }
+    }
+
+    private static function getCount() {
+        if (self::$items) {
+            $count = 0;
+            foreach (self::$items as $item) {
+                if ($item['type'] == 'product') {
+                    $count += $item['quantity'];
+                }
+            }
+            return $count;
+        } else {
+            $cart = new shopCart();
+            return $cart->count();
+        }
+    }
 
     /**
      * Проверка текущего заказ на соответсвие минимальным требованиям.
@@ -9,7 +48,7 @@ class shopWholesale {
      * 
      * @return array('result' => boolean, 'message' => string)
      */
-    public static function checkOrder() {
+    public static function checkOrder($items = null) {
         $return = array(
             'result' => true,
             'message' => '',
@@ -26,19 +65,23 @@ class shopWholesale {
             return $return;
         }
 
-        $cart = new shopCart();
+        if ($items && class_exists('shopInstantorderPlugin')) {
+            self::$items = $items;
+        }
+
         $primary_currency = wa('shop')->getConfig()->getCurrency(true);
         $frontend_currency = wa('shop')->getConfig()->getCurrency(false);
 
-        $total = $cart->total(true);
+        $total = self::getTotal();
         $total = shop_currency($total, $frontend_currency, $primary_currency, false);
         $min_order_sum = $route_settings['min_order_sum'];
         $min_order_sum_format = shop_currency($min_order_sum);
+        $count = self::getCount();
 
         if ($route_settings['min_order_sum_enabled'] && $total < $min_order_sum) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['min_order_sum_message'], $min_order_sum_format);
-        } elseif ($route_settings['min_order_products_enabled'] && $cart->count() < $route_settings['min_order_products']) {
+        } elseif ($route_settings['min_order_products_enabled'] && $count < $route_settings['min_order_products']) {
             $return['result'] = false;
             $return['message'] = sprintf($route_settings['min_order_products_message'], $route_settings['min_order_products']);
         } elseif ($route_settings['product_count_setting'] && !self::checkMinProductsCartCount($product_name, $min_product_count)) {
@@ -90,10 +133,9 @@ class shopWholesale {
 
         $plugins = $route_settings['plugins'];
 
-        $cart = new shopCart();
         $def_currency = wa('shop')->getConfig()->getCurrency(true);
         $cur_currency = wa('shop')->getConfig()->getCurrency(false);
-        $total = $cart->total(true);
+        $total = self::getTotal();
         $total = shop_currency($total, $cur_currency, $def_currency, false);
 
         if (!empty($plugins[$shipping_id]) && $total < $plugins[$shipping_id]) {
@@ -184,8 +226,7 @@ class shopWholesale {
      * @return boolean
      */
     public static function checkMinCategoryCount(&$category_name = null, &$min_category_count = null) {
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
         $wholesale_categories = array();
         $category_products_model = new shopCategoryProductsModel();
         foreach ($items as $item) {
@@ -221,8 +262,7 @@ class shopWholesale {
         $category_model = new shopCategoryModel();
         $category = $category_model->getById($category_id);
         $count = 0;
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
         foreach ($items as $item) {
             if ($item['type'] == 'product' && self::inCategory($category, $item['product'])) {
                 $count += $item['quantity'];
@@ -259,8 +299,7 @@ class shopWholesale {
      * @return boolean
      */
     public static function checkMinCategorySum(&$category_name = null, &$min_category_sum = null) {
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
         $wholesale_categories = array();
         $category_products_model = new shopCategoryProductsModel();
         foreach ($items as $item) {
@@ -296,8 +335,7 @@ class shopWholesale {
         $category_model = new shopCategoryModel();
         $category = $category_model->getById($category_id);
         $sum = 0;
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
         $primary_currency = wa('shop')->getConfig()->getCurrency(true);
         foreach ($items as $item) {
             if ($item['type'] == 'product' && self::inCategory($category, $item['product'])) {
@@ -355,14 +393,12 @@ class shopWholesale {
      * @return boolean
      */
     public static function checkMinProductsCartCount(&$product_name = null, &$min_product_count = null, &$item = null) {
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
         foreach ($items as $item) {
             if ($item['type'] == 'product' && !self::checkMinProductCount($item['product'], $item['quantity'], $product_name, $min_product_count)) {
                 return false;
             }
         }
-        unset($item);
         return true;
     }
 
@@ -383,14 +419,12 @@ class shopWholesale {
      * @param type $multiplicity_product_count - в эту переменную записывается кратность товара.
      */
     public static function checkMultiplicityProductsCartCount(&$product_name = null, &$multiplicity_product_count = null, &$item = null) {
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
         foreach ($items as $item) {
             if ($item['type'] == 'product' && !self::checkMultiplicityProductCount($item['product'], $item['quantity'], $product_name, $multiplicity_product_count)) {
                 return false;
             }
         }
-        unset($item);
         return true;
     }
 
@@ -413,8 +447,8 @@ class shopWholesale {
      */
     public static function checkMinSkusCartCount(&$product_name = null, &$min_sku_count = null, &$item = null) {
         $sku_model = new shopProductSkusModel();
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
+        ;
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
                 $sku = $sku_model->getById($item['sku_id']);
@@ -423,7 +457,6 @@ class shopWholesale {
                 }
             }
         }
-        unset($item);
         return true;
     }
 
@@ -451,8 +484,7 @@ class shopWholesale {
      */
     public static function checkMultiplicitySkusCartCount(&$product_name = null, &$multiplicity_sku_count = null, &$item = null) {
         $sku_model = new shopProductSkusModel();
-        $cart = new shopCart();
-        $items = $cart->items();
+        $items = self::getItems();
         foreach ($items as $item) {
             if ($item['type'] == 'product') {
                 $sku = $sku_model->getById($item['sku_id']);
@@ -461,7 +493,6 @@ class shopWholesale {
                 }
             }
         }
-        unset($item);
         return true;
     }
 

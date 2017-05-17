@@ -42,7 +42,7 @@
             <input type="hidden" value="0" name="route_settings[redirect]" />
             <input type="checkbox" value="1" name="route_settings[redirect]" {if $route_settings.redirect|default:1}checked="checked"{/if} />
             <p class="hint">Если опция включена, тогда осуществляется перенаправление со страниц оформления заказа на страницу корзины. 
-                Данная опция позволяет предотвратить прямые переходы к оформлению заказа минуя корзину, в обход проверки минимального заказа. 
+                Данная опция позволяет предотвратить прямые переходы к оформлению заказа, минуя корзину, в обход проверки минимального заказа. 
                 Данная опция вызывает циклическую переадресацию и должна быть отключена, если у вас дополнительно установлен плагин 
                 <a target="_blank" href="http://www.webasyst.ru/store/plugin/shop/onestep/">"Заказ на одной странице"</a>
             </p>
@@ -183,7 +183,7 @@
         <div class="value">
             <input type="hidden" value="0" name="route_settings[auto_add_product_count_setting]" />
             <input type="checkbox" value="1" name="route_settings[auto_add_product_count_setting]" {if $route_settings.auto_add_product_count_setting|default:0}checked="checked"{/if} />
-            <p class="hint">Если для товара установлено минимальное количество и количество данного товара в корзине покупателя меньше заданного, то плагин автоматически увеличит количество данного товара в корзине до минимального</p>
+            <p class="hint">Если для товара установлено минимальное количество, и количество данного товара в корзине покупателя меньше заданного, то плагин автоматически увеличит количество данного товара в корзине до минимального</p>
         </div>
     </div>
     <div class="field"{if !$route_settings.product_count_setting|default:0} style="display: none;"{/if}>
@@ -208,7 +208,7 @@
             <input class="ibutton s-ibutton-enabled-field"  type="checkbox" value="1" name="route_settings[product_multiplicity_setting]" {if $route_settings.product_multiplicity_setting|default:0}checked="checked"{/if} />
         </div>
         <p class="hint">Кратность позволяет продавать товар кратно какому-либо значению. 
-            Например, установленная кратность для товара равная 3, позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
+            Например, установленная кратность для товара равная 3 позволяет заказать товар в количестве 3шт., 6шт., 9шт. и тд. 
             При этом покупатель не может заказать 1шт,2шт,4шт и тд. штук товара.</p>
     </div>
     <div class="field"{if !$route_settings.product_multiplicity_setting|default:0} style="display: none;"{/if}>
@@ -218,7 +218,7 @@
         <div class="value">
             <input type="hidden" value="0" name="route_settings[auto_add_product_multiplicity_setting]" />
             <input type="checkbox" value="1" name="route_settings[auto_add_product_multiplicity_setting]" {if $route_settings.auto_add_product_multiplicity_setting|default:0}checked="checked"{/if} />
-            <p class="hint">Если для товара установлено кратное количество и количество данного товара в корзине покупателя не является кратным, то плагин автоматически увеличит количество данного товара в корзине до кратного</p>
+            <p class="hint">Если для товара установлено кратное количество, и количество данного товара в корзине покупателя не является кратным, то плагин автоматически увеличит количество данного товара в корзине до кратного</p>
         </div>
     </div>
     <div class="field"{if !$route_settings.product_multiplicity_setting|default:0} style="display: none;"{/if}>
@@ -262,7 +262,7 @@
         <div class="value">
             <input type="hidden" value="0" name="route_settings[category_count_setting]" />
             <input class="ibutton s-ibutton-enabled-field" type="checkbox" value="1" name="route_settings[category_count_setting]" {if $route_settings.category_count_setting|default:0}checked="checked"{/if} />
-            <p class="hint">Задать настройки для каждой из категрий можно в разделе «Товары», затем выбрать нужную категорию и нажать «Настройки категории»</p>
+            <p class="hint">Задать настройки для каждой из категорий можно в разделе «Товары», затем выбрать нужную категорию и нажать «Настройки категории»</p>
         </div>
     </div>
     <div class="field"{if !$route_settings.category_count_setting|default:0} style="display: none;"{/if}>
@@ -282,7 +282,7 @@
     <h3>Настройки минимального заказа для различных способов доставки</h3>
     <div class="field">
         <div class="name">
-            Использовать настройки для способов оплаты
+            Использовать настройки для способов доставки
         </div>
         <div class="value no-shift">
             <input type="hidden" name="route_settings[shipping_settings_enabled]" value="0">
@@ -295,7 +295,7 @@
         </div>
         <div class="value">
             <input type="text" value="{$route_settings.shipping_submit_selector|default:'.step-shipping .checkout-step-content:not(.auth) [type=submit]'|escape}" name="route_settings[shipping_submit_selector]" />
-            <p class="hint">Плагин блокирует кнопку "Далее" используя указанный селектор</p>
+            <p class="hint">Плагин блокирует кнопку "Далее", используя указанный селектор</p>
         </div>
     </div>
     <div class="field"{if !$route_settings.shipping_settings_enabled|default:0} style="display:none"{/if}>
