@@ -219,7 +219,12 @@
         shipping: {
             disabled: false,
             message: '',
-            options: {},
+            inited: false,
+            options: {
+                onestep_url: '',
+                url: '',
+                shipping_submit_selector: ''
+            },
             init: function (options) {
                 this.options = options;
                 if (!this.checkSettings()) {
@@ -234,13 +239,18 @@
                 }
                 this.options.wholesale_shipping = '#wholesale-shipping';
                 this.initChangeShipping();
-                this.initOnestepFormSubmit();
+                if (this.options.is_onestep) {
+                    this.initOnestepFormSubmit();
+                    this.initAjaxComplete();
+                }
                 $('input[name=shipping_id]:checked').change();
+                this.inited = true;
             },
             checkSettings: function () {
                 /*Проверка наличия плагина заказ на одной странице*/
                 if ($('.onestep-cart').length) {
                     this.options.is_onestep = true;
+                    this.options.shipping_submit_selector = 'form.checkout-form #checkout-btn';
                 } else {
                     this.options.is_onestep = false;
                     if (!$(this.options.shipping_submit_selector).length) {
@@ -251,17 +261,20 @@
                 return true;
             },
             initOnestepFormSubmit: function () {
-                var self = this;
+                var wholesale = this;
                 $('form.checkout-form').submit(function () {
-                    if (self.disabled) {
-                        if (self.message) {
-                            alert(self.message)
+                    if (!$('[name=user_type]:checked').length || $('[name=user_type]:checked').val() == 0) {
+                        if (wholesale.disabled) {
+                            if (wholesale.message) {
+                                alert(wholesale.message)
+                            }
+                            return false;
                         }
-                        return false;
                     }
                 });
             },
             disableCheckout: function (loading, message) {
+                console.log('disableCheckout');
                 if ($('#wholesale-shipping-loading').length) {
                     $('#wholesale-shipping-loading').remove();
                 }
@@ -274,6 +287,7 @@
                 if (this.options.is_onestep) {
                     this.disabled = true;
                     this.message = message;
+                    $(this.options.shipping_submit_selector).attr('disabled', true);
                     $(this.options.wholesale_shipping).text(message);
                     if (message) {
                         $(this.options.wholesale_shipping).removeClass('hidden').addClass('active').show();
@@ -294,6 +308,7 @@
                 }
             },
             enableCheckout: function () {
+                console.log('enableCheckout');
                 if ($('#wholesale-shipping-loading').length) {
                     $('#wholesale-shipping-loading').remove();
                 }
@@ -331,6 +346,21 @@
                         error: function (jqXHR, errorText) {
                         }
                     });
+                });
+                $('input[name=shipping_id]:checked').change();
+            },
+            initAjaxComplete: function () {
+                var wholesale = this;
+                $(document).ajaxComplete(function (event, xhr, settings) {
+                    if (settings.url == wholesale.options.onestep_url) {
+                        setTimeout(function () {
+                            if (wholesale.disabled) {
+                                wholesale.disableCheckout(false, wholesale.message);
+                            } else {
+                                wholesale.enableCheckout();
+                            }
+                        }, 300);
+                    }
                 });
             }
         }

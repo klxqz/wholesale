@@ -27,4 +27,6 @@ try {
 }
 
 $domains_settings = array();
-shopWholesale::saveDomainsSettings($domains_settings);
+if (method_exists('shopWholesale', 'saveDomainsSettings')) {
+    shopWholesale::saveDomainsSettings($domains_settings);
+}

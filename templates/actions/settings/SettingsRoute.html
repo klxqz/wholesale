@@ -12,7 +12,7 @@
 </div>
 
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Настройки минимального заказа в корзине</h3>
 
     <div class="field">
@@ -64,7 +64,7 @@
 </div>
 <div class="clear-both"></div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Настройки минимального заказа в карточке товара</h3>
     <div class="field">
         <div class="name">
@@ -104,7 +104,7 @@
 </div>
 <div class="clear-both"></div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Минимальная сумма всего заказа</h3>
     <p class="hint">Плагин выполняет проверку минимальной суммы заказа на странице корзины</p>
     <div class="field">
@@ -135,7 +135,7 @@
     </div>
 </div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Минимальное количество всего заказа</h3>
     <p class="hint">Плагин выполняет проверку минимального количества товаров в заказе на странице корзины</p>
     <div class="field">
@@ -165,7 +165,7 @@
     </div>
 </div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Минимальное количество для товара и артикула</h3>
     <div class="field">
         <div class="name">
@@ -197,7 +197,7 @@
 </div>
 <div class="clear-both"></div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Кратность для товара и артикула</h3>
     <div class="field">
         <div class="name">
@@ -231,7 +231,7 @@
     </div>
 </div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Минимальная сумма для категории</h3>
     <div class="field">
         <div class="name">
@@ -253,7 +253,7 @@
 </div>
 <div class="clear-both"></div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Минимальное количество для категории</h3>
     <div class="field">
         <div class="name">
@@ -277,7 +277,7 @@
 <div class="clear-both"></div>
 
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
 
     <h3>Настройки минимального заказа для различных способов доставки</h3>
     <div class="field">
@@ -347,7 +347,7 @@
     </div>
 </div>
 
-<div class="field-group">
+<div class="field-group"{if !$route_settings.status|default:0} style="display:none;"{/if}>
     <h3>Шаблоны</h3>
     <div class="templates-block">
         {foreach $templates as $key  => $template}

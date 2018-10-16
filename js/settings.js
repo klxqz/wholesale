@@ -69,7 +69,13 @@
                         labelOff: "Выкл",
                         className: 'mini'
                     });
-
+                    $('input[name="route_settings[status]"]').change(function () {
+                        if ($(this).is(':checked')) {
+                            $(this).closest('.field-group').siblings().show(200);
+                        } else {
+                            $(this).closest('.field-group').siblings().hide(200);
+                        }
+                    });
                     $('.s-ibutton-enabled-field.ibutton').iButton({
                         labelOn: "Вкл",
                         labelOff: "Выкл",
@@ -89,7 +95,10 @@
                             mode: "text/" + templates[i].mode,
                             tabMode: "indent",
                             height: "dynamic",
-                            lineWrapping: true
+                            lineWrapping: true,
+                            onChange: function (c) {
+                                c.save();
+                            }
                         });
                     }
 

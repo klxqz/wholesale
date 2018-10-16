@@ -160,14 +160,36 @@ class shopWholesalePlugin extends shopPlugin {
 
             $shipping_submit_selector = isset($route_settings['shipping_submit_selector']) ? $route_settings['shipping_submit_selector'] : '';
             $url = wa()->getRouteUrl('shop/frontend/shipping', array('plugin' => 'wholesale'));
+            if (class_exists(shopOnestepPlugin)) {
+                $onestep_url = wa()->getRouteUrl('shop/frontend/onestep', true);
+            } else {
+                $onestep_url = '';
+            }
+
             return <<<HTML
-<script type="text/javascript" src="{$wholesale_js_url}?v{$version}"></script>
 <script type="text/javascript">
     $(function () {
-        $.wholesale.shipping.init({
-            url: '{$url}',
-            shipping_submit_selector: '{$shipping_submit_selector}'
-        });
+        if ($.wholesale == undefined) {
+            $.getScript("{$wholesale_js_url}?v{$version}")
+            .done(function( script, textStatus ) {
+                $.wholesale.shipping.init({
+                    onestep_url: '{$onestep_url}',
+                    url: '{$url}',
+                    shipping_submit_selector: '{$shipping_submit_selector}'
+                });
+            })
+            .fail(function( jqxhr, settings, exception ) {
+                alert('Ошибка загрузки {$wholesale_js_url}');
+            });
+        } else {
+            if (!$.wholesale.shipping.inited) {
+                $.wholesale.shipping.init({
+                    onestep_url: '{$onestep_url}',
+                    url: '{$url}',
+                    shipping_submit_selector: '{$shipping_submit_selector}'
+                });
+            }
+        }
     });
 </script>
 HTML;
