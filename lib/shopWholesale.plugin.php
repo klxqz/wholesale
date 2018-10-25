@@ -160,7 +160,7 @@ class shopWholesalePlugin extends shopPlugin {
 
             $shipping_submit_selector = isset($route_settings['shipping_submit_selector']) ? $route_settings['shipping_submit_selector'] : '';
             $url = wa()->getRouteUrl('shop/frontend/shipping', array('plugin' => 'wholesale'));
-            if (class_exists(shopOnestepPlugin)) {
+            if (class_exists('shopOnestepPlugin')) {
                 $onestep_url = wa()->getRouteUrl('shop/frontend/onestep', true);
             } else {
                 $onestep_url = '';
