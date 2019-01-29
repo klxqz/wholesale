@@ -4,7 +4,8 @@
  * @author wa-plugins.ru <support@wa-plugins.ru>
  * @link http://wa-plugins.ru/
  */
-class shopWholesalePlugin extends shopPlugin {
+class shopWholesalePlugin extends shopPlugin
+{
 
     public static $templates = array(
         'wholesale_js' => array(
@@ -16,7 +17,8 @@ class shopWholesalePlugin extends shopPlugin {
         ),
     );
 
-    public function saveSettings($settings = array()) {
+    public function saveSettings($settings = array())
+    {
         $route_hash = waRequest::post('route_hash');
         $route_settings = waRequest::post('route_settings');
 
@@ -59,7 +61,8 @@ class shopWholesalePlugin extends shopPlugin {
         }
     }
 
-    public function backendProductSkuSettings($params) {
+    public function backendProductSkuSettings($params)
+    {
         if ($this->getSettings('status')) {
             $sku = $params['sku'];
             $view = wa()->getView();
@@ -70,7 +73,8 @@ class shopWholesalePlugin extends shopPlugin {
         }
     }
 
-    public function backendProductEdit($product) {
+    public function backendProductEdit($product)
+    {
         if ($this->getSettings('status')) {
             $view = wa()->getView();
             $view->assign('product', $product);
@@ -79,7 +83,8 @@ class shopWholesalePlugin extends shopPlugin {
         }
     }
 
-    public function backendCategoryDialog($category) {
+    public function backendCategoryDialog($category)
+    {
         if ($this->getSettings('status')) {
             $view = wa()->getView();
             $view->assign(array(
@@ -92,7 +97,8 @@ class shopWholesalePlugin extends shopPlugin {
         }
     }
 
-    public function categorySave($category) {
+    public function categorySave($category)
+    {
         if ($this->getSettings('status')) {
             $update = array();
             if (($wholesale_min_sum = waRequest::post('wholesale_min_sum', -1)) != -1) {
@@ -108,7 +114,8 @@ class shopWholesalePlugin extends shopPlugin {
         }
     }
 
-    public function frontendCheckout($param) {
+    public function frontendCheckout($param)
+    {
         $plugin = wa()->getPlugin('wholesale');
         if (!$plugin->getSettings('status')) {
             return false;
@@ -196,14 +203,16 @@ HTML;
         }
     }
 
-    private function setQuantity($item_id, $quantity) {
+    private function setQuantity($item_id, $quantity)
+    {
         $cart = new shopCart();
         $cart->setQuantity($item_id, $quantity);
         $url = wa()->getConfig()->getCurrentUrl();
         wa()->getResponse()->redirect($url);
     }
 
-    public function frontendCart() {
+    public function frontendCart()
+    {
         if (!$this->getSettings('status')) {
             return false;
         }
@@ -247,24 +256,35 @@ HTML;
         $wholesale_js_url = shopWholesaleRouteHelper::getRouteTemplateUrl('wholesale_js', $route_hash);
         $version = $this->getVersion();
 
-        $cart_total_selector = isset($route_settings['cart_total_selector']) ? $route_settings['cart_total_selector'] : '';
-        $checkout_selector = isset($route_settings['checkout_selector']) ? $route_settings['checkout_selector'] : '';
-        $url = wa()->getRouteUrl('shop/frontend/cart', array('plugin' => 'wholesale'));
+        $init_data = array(
+            'url' => wa()->getRouteUrl('shop/frontend/cart', array('plugin' => 'wholesale')),
+            'checkout_selector' => isset($route_settings['checkout_selector']) ? $route_settings['checkout_selector'] : '',
+            'cart_actions' => array('save/', 'add/', 'delete/')
+
+        );
+
+        $ss_version = explode('.', wa('shop')->getVersion());
+        if ($ss_version[0] >= 8) {
+            $init_data['order_calculate_url'] = wa()->getRouteUrl('shop/frontendOrder', array('action' => 'calculate'));
+        }
+
+        if (class_exists('shopOnestepPlugin')) {
+            $init_data['onestep_url'] = wa()->getRouteUrl('shop/frontend/onestep');
+        }
+
+        $json = json_encode($init_data);
         return <<<HTML
 <script type="text/javascript" src="{$wholesale_js_url}?v{$version}"></script> 
 <script type="text/javascript">
     $(function () {
-        $.wholesale.cart.init({
-            url: '{$url}',
-            checkout_selector: '{$checkout_selector}',
-            cart_total_selector: '{$cart_total_selector}'
-        });
+        $.wholesale.cart.init({$json});
     });
 </script>
 HTML;
     }
 
-    public function frontendProduct($product) {
+    public function frontendProduct($product)
+    {
         if (!$this->getSettings('status')) {
             return false;
         }
@@ -303,15 +323,18 @@ HTML;
     }
 
     //устаревшие методы
-    public static function display() {
+    public static function display()
+    {
         return false;
     }
 
-    public static function displayFrontendCart() {
+    public static function displayFrontendCart()
+    {
         return false;
     }
 
-    public static function displayFrontendProduct() {
+    public static function displayFrontendProduct()
+    {
         return false;
     }
 

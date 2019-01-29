@@ -1,13 +1,95 @@
 (function ($) {
     $.wholesale = {
         cart: {
-            options: {},
+            options: {
+                cart_actions: [],
+                checkout_selector: '',
+                is_cart: false,
+                is_onestep: false,
+                is_ss8order: false,
+                onestep_url: '',
+                order_calculate_url: '',
+                url: '',
+                wholesale_selector: '#wholesale-cart'
+            },
             init: function (options) {
-                this.options = options;
+                $.extend(this.options, options);
+
                 if (!this.checkSettings()) {
                     return false;
                 }
+                console.log('wholesale init:');
+                console.log(this.options);
 
+                if (this.options.is_ss8order) {
+                    this.orderCalculate();
+                } else if (this.options.is_cart) {
+                    this.cartActions();
+                } else if (this.options.is_onestep) {
+                    this.onestepComplete();
+                }
+            },
+            checkSettings: function () {
+                /*Проверка наличия плагина заказ на одной странице*/
+                if ($('.onestep-cart').length) {
+                    this.options.is_onestep = true;
+                } else if ($('#wa-order-form-wrapper').length) {
+                    /*Проверка одностраничного оформления заказа в Shop-Script 8*/
+                    this.options.is_ss8order = true;
+                    this.options.checkout_selector = '.wa-actions-section .js-submit-order-button';
+                } else {
+                    this.options.is_cart = true;
+                    if (!$(this.options.checkout_selector).length) {
+                        console.log('Указанный селектор не удалось найти "' + this.options.checkout_selector + '"');
+                        console.log('Выполняется автоматический поиск.');
+                        if ($('[name=checkout]').length) {
+                            console.log('Найден [name=checkout]');
+                            this.options.checkout_selector = '[name=checkout]';
+                        } else {
+                            console.log('Селектор checkout_selector не найден');
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            },
+            orderCalculate: function () {
+                var wholesale = this;
+                console.log('wholesale init orderCalculate');
+                $(document).ajaxComplete(function (event, xhr, settings) {
+                    console.log('wholesale orderCalculate:');
+                    console.log(settings);
+                    console.log(settings.url === wholesale.options.order_calculate_url);
+                    if (settings.url === wholesale.options.order_calculate_url) {
+                        wholesale.checkCart();
+                    }
+                });
+            },
+            onestepComplete: function () {
+                var wholesale = this;
+                console.log('wholesale init onestepComplete');
+                $(document).ajaxComplete(function (event, xhr, settings) {
+                    console.log('wholesale onestepComplete:');
+                    console.log(settings);
+                    console.log(settings.url.indexOf(wholesale.options.onestep_url));
+                    if (settings.url.indexOf(wholesale.options.onestep_url) != -1) {
+                        wholesale.checkCart();
+                    }
+                });
+            },
+            cartActions: function () {
+                var wholesale = this;
+                console.log('wholesale init cartActions');
+                $(document).ajaxComplete(function (event, xhr, settings) {
+                    console.log('wholesale cartActions:');
+                    console.log(settings);
+                    console.log($.inArray(settings.url, wholesale.options.cart_actions));
+                    if ($.inArray(settings.url, wholesale.options.cart_actions) != -1) {
+                        wholesale.checkCart();
+                    }
+                });
+            },
+            disableCheckout: function (loading, message) {
                 if (!$('#wholesale-cart').length) {
                     if (this.options.is_onestep) {
                         $('.onestep-cart .onestep-cart-form').after('<div id="wholesale-cart" class="hidden" style="display:none;"></div>');
@@ -15,41 +97,7 @@
                         $(this.options.checkout_selector).after('<div id="wholesale-cart" class="hidden" style="display:none;"></div>');
                     }
                 }
-                this.options.wholesale_selector = '#wholesale-cart';
-                this.initUpdateCart();
-                this.initCartTotalChange();
 
-            },
-            checkSettings: function () {
-                /*Проверка наличия плагина заказ на одной странице*/
-                if ($('.onestep-cart').length) {
-                    this.options.is_onestep = true;
-                    this.options.cart_total_selector = '.onestep-cart .cart-total';
-
-                } else {
-                    this.options.is_onestep = false;
-                    if (!$(this.options.cart_total_selector).length) {
-                        console.log('Указан неверный селектор "' + this.options.cart_total_selector + '"');
-                        return false;
-                    }
-                    if (!$(this.options.checkout_selector).length) {
-                        console.log('Указан неверный селектор "' + this.options.checkout_selector + '"');
-                        return false;
-                    }
-                }
-                return true;
-            },
-            initCartTotalChange: function () {
-                var $cart_total = $(this.options.cart_total_selector);
-                var total = '';
-                setInterval(function () {
-                    if (total != $cart_total.html()) {
-                        total = $cart_total.html();
-                        $(document).trigger('updateCart');
-                    }
-                }, 500);
-            },
-            disableCheckout: function (loading, message) {
                 if ($('#wholesale-cart-loading').length) {
                     $('#wholesale-cart-loading').remove();
                 }
@@ -113,16 +161,11 @@
                         wholesale.enableCheckout();
                     }
                 });
-            },
-            initUpdateCart: function () {
-                var wholesale = this;
-                $(document).on('updateCart', function () {
-                    wholesale.checkCart();
-                });
             }
         },
         product: {
-            options: {},
+            options: {}
+            ,
             init: function (options) {
                 this.options = options;
                 if (!this.checkSettings()) {
@@ -135,7 +178,8 @@
                 this.initProductQuantityChange();
                 this.initSkuChange();
                 this.initUpdateProductQuantity();
-            },
+            }
+            ,
             checkSettings: function () {
                 if (!$(this.options.product_cart_form_selector).length) {
                     console.log('Указан неверный селектор "' + this.options.product_cart_form_selector + '"');
@@ -150,7 +194,8 @@
                     return false;
                 }
                 return true;
-            },
+            }
+            ,
             initSkuChange: function () {
                 $(this.options.product_cart_form_selector).find('[name=sku_id]').change(function () {
                     $(document).trigger('updateProductQuantity');
@@ -159,7 +204,8 @@
                     $(document).trigger('updateProductQuantity');
                 });
 
-            },
+            }
+            ,
             initProductQuantityChange: function () {
                 var $input_quantity = this.options.input_quantity;
                 var quantity = '';
@@ -169,7 +215,8 @@
                         $(document).trigger('updateProductQuantity');
                     }
                 }, 500);
-            },
+            }
+            ,
             checkProduct: function () {
                 var wholesale = this;
                 if (!wholesale.options.busy && !$(this.options.product_add2cart_selector).is(':disabled')) {
@@ -208,23 +255,31 @@
                         }
                     });
                 }
-            },
+            }
+            ,
             initUpdateProductQuantity: function () {
                 var wholesale = this;
                 $(document).on('updateProductQuantity', function () {
                     wholesale.checkProduct();
                 });
             }
-        },
+        }
+        ,
         shipping: {
             disabled: false,
-            message: '',
-            inited: false,
-            options: {
-                onestep_url: '',
-                url: '',
-                shipping_submit_selector: ''
-            },
+            message:
+                '',
+            inited:
+                false,
+            options:
+                {
+                    onestep_url: '',
+                    url:
+                        '',
+                    shipping_submit_selector:
+                        ''
+                }
+            ,
             init: function (options) {
                 this.options = options;
                 if (!this.checkSettings()) {
@@ -245,7 +300,8 @@
                 }
                 $('input[name=shipping_id]:checked').change();
                 this.inited = true;
-            },
+            }
+            ,
             checkSettings: function () {
                 /*Проверка наличия плагина заказ на одной странице*/
                 if ($('.onestep-cart').length) {
@@ -259,7 +315,8 @@
                     }
                 }
                 return true;
-            },
+            }
+            ,
             initOnestepFormSubmit: function () {
                 var wholesale = this;
                 $('form.checkout-form').submit(function () {
@@ -272,7 +329,8 @@
                         }
                     }
                 });
-            },
+            }
+            ,
             disableCheckout: function (loading, message) {
                 console.log('disableCheckout');
                 if ($('#wholesale-shipping-loading').length) {
@@ -306,7 +364,8 @@
                         $('<span id="wholesale-shipping-loading"><i class="icon16 loading"></i> Пожалуйста, подождите...</span>').insertBefore(this.options.shipping_submit_selector);
                     }
                 }
-            },
+            }
+            ,
             enableCheckout: function () {
                 console.log('enableCheckout');
                 if ($('#wholesale-shipping-loading').length) {
@@ -323,7 +382,8 @@
                     $(this.options.wholesale_shipping).removeClass('active').addClass('hidden').hide();
                     $(this.options.shipping_submit_selector).removeAttr('disabled');
                 }
-            },
+            }
+            ,
             initChangeShipping: function () {
                 var wholesale = this;
                 $(document).off('change', 'input[name=shipping_id]').on('change', 'input[name=shipping_id]', function () {
@@ -348,7 +408,8 @@
                     });
                 });
                 $('input[name=shipping_id]:checked').change();
-            },
+            }
+            ,
             initAjaxComplete: function () {
                 var wholesale = this;
                 $(document).ajaxComplete(function (event, xhr, settings) {
@@ -364,5 +425,6 @@
                 });
             }
         }
-    };
+    }
+    ;
 })(jQuery);
