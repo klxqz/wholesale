@@ -28,6 +28,7 @@
                 } else if (this.options.is_onestep) {
                     this.onestepComplete();
                 }
+                this.checkCart();
             },
             checkSettings: function () {
                 /*Проверка наличия плагина заказ на одной странице*/
